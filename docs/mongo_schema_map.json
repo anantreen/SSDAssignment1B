@@ -1,36 +1,99 @@
 {
-  "PropertyAmenities": {
-    "_id": "MongoDB ObjectId",
-    "property_id": "Integer (MUST exactly match an integer property_id in Postgres)",
-    "house_rules": [
-      "Array of Strings (e.g., 'No smoking', 'No pets')"
-    ],
-    "accessibility_features": [
-      "Array of Strings (e.g., 'Elevator', 'Step-free access')"
-    ]
+  "SearchSessions": {
+    "validator": {
+      "bsonType": "object",
+      "required": ["location", "created_at"],
+      "properties": {
+        "location": {
+          "bsonType": "object",
+          "required": ["type", "coordinates"],
+          "properties": {
+            "type": {
+              "enum": ["Point"]
+            },
+            "coordinates": {
+              "bsonType": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "bsonType": ["double", "int", "long", "decimal"]
+              }
+            }
+          }
+        },
+        "created_at": {
+          "bsonType": "date"
+        },
+        "session_id": {
+          "bsonType": "string"
+        },
+        "user_device": {
+          "bsonType": "string"
+        }
+      }
+    },
+    "indexes": ["idx_sessions_geo_recent", "idx_sessions_ttl (7200 seconds)"]
   },
   "PropertyReviews": {
-    "_id": "MongoDB ObjectId",
-    "property_id": "Integer (MUST exactly match an integer property_id in Postgres)",
-    "guest_id": "Integer (MUST exactly match an integer guest_id in Postgres)",
-    "rating": "Double (Number from 1.0 to 5.0)",
-    "review_text": "String (A long paragraph of text)",
-    "location_tags": [
-      "Array of Strings (e.g., 'Beachfront', 'Downtown')"
-    ],
-    "timestamp": "ISODate (Time the review was written)"
-  },
-  "SearchSessions": {
-    "_id": "MongoDB ObjectId",
-    "session_id": "String (UUID - this one can stay a UUID because it is unique to Mongo)",
-    "user_device": "String (e.g., 'Mobile', 'Desktop')",
-    "location": {
-      "type": "String (Must strictly be the word 'Point')",
-      "coordinates": [
-        "Array of Doubles: [Longitude, Latitude] - MUST be in this specific order for MongoDB 2dsphere!"
-      ]
+    "validator": {
+      "bsonType": "object",
+      "required": ["property_id", "guest_id", "rating", "location_tags", "timestamp"],
+      "properties": {
+        "property_id": {
+          "bsonType": "int",
+          "minimum": 1
+        },
+        "guest_id": {
+          "bsonType": "int",
+          "minimum": 1
+        },
+        "rating": {
+          "bsonType": "int",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "location_tags": {
+          "bsonType": "array",
+          "items": {
+            "bsonType": "string"
+          }
+        },
+        "timestamp": {
+          "bsonType": "date"
+        },
+        "review_text": {
+          "bsonType": "string"
+        }
+      }
     },
-    "created_at": "ISODate (Used by the TTL index to auto-delete after 2 hours)"
+    "indexes": ["idx_reviews_property_time"]
+  },
+  "PropertyAmenities": {
+    "validator": {
+      "bsonType": "object",
+      "required": ["property_id", "house_rules", "accessibility_features"],
+      "properties": {
+        "property_id": {
+          "bsonType": "int",
+          "minimum": 1
+        },
+        "house_rules": {
+          "bsonType": "array",
+          "items": {
+            "bsonType": "string"
+          }
+        },
+        "accessibility_features": {
+          "bsonType": "array",
+          "items": {
+            "bsonType": "string"
+          }
+        },
+        "amenities": {
+          "bsonType": "object"
+        }
+      }
+    },
+    "indexes": ["idx_amenities_property (unique)"]
   }
 }
-

@@ -1,11 +1,9 @@
-// 1. Connect to the correct database 
-db = db.getSiblingDB('stayspot');
+/**
+ * Keep the existing setup command while Member 4 owns the documented validator/index
+ * code.
+ * This file delegates inside mongosh; it does not create a second set of collection
+ * rules.
+ */
 
-// 2. Create the Geospatial Index
-// This tells MongoDB to treat the "location" field as spherical map coordinates.
-db.SearchSessions.createIndex({ location: "2dsphere" });
-
-// 3. Create the Time-To-Live Index
-// The "1" means we are indexing the dates in ascending order. 
-// "expireAfterSeconds: 7200" is the 2-hour deletion rule.
-db.SearchSessions.createIndex({ created_at: 1 }, { expireAfterSeconds: 7200 });
+// Compatibility entry point: same mongosh command and database behavior.
+load("members/member4/mongo/01_collections_and_indexes.js");

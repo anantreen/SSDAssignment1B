@@ -1,823 +1,1492 @@
-# StaySpot: Vacation Rental Database Architecture
+# SSDAssignment1B — StaySpot Assignment 2
 
-**Repository:** https://github.com/git-adityamishra/27_a1
-**Final Commit Hash:** `1db75888f1eab9f892f7f34b04b17f93915834b4`
+A working browser front end for StaySpot, with a PostgreSQL/MongoDB API and all four inherited workflows. The local folder is **StaySpot2**; the product name is **StaySpot**.
 
-This repository contains the backend database engineering for **StaySpot**, a high-performance vacation rental platform. The architecture utilizes a hybrid database approach, combining the strict ACID compliance of PostgreSQL for financial ledgers with the flexible, geospatial capabilities of MongoDB for user search clustering and reviews.
+**Source repository:** https://github.com/git-adityamishra/27_a1
+**Inherited main commit:** `774fbd2f33463c3e88352bdb0b7988165c65abcf`
+**Submission repository:** https://github.com/anantreen/SSDAssignment1B
+**Final commit hash:** resolve the current published revision with `git rev-parse HEAD` or [GitHub commits](https://github.com/anantreen/SSDAssignment1B/commits/main). The packaging script stamps that exact committed SHA into the ZIP README.
+**Demo walkthrough:** [demo_walkthrough.mp4](docs/demo_walkthrough.mp4) — captioned actual live-browser captures, under five minutes; method disclosed in [browser verification](docs/browser_verification.md). Add the team's uploaded share link here if an external demo URL is required.
 
-## 🛠 Tech Stack & Prerequisites
-* **Relational Database:** PostgreSQL 14+ (Financial transactions, bookings, constraints)
-* **NoSQL Database:** MongoDB 6.0+ (Geospatial search, time-to-live sessions, review analytics)
-* **Data Generation:** Python 3.9+ (`psycopg2`, `pymongo`, `faker`)
+## Run the front end
 
----
-
-## 🗄️ PostgreSQL Architecture (Financial & Booking Core)
-
-The relational schema guarantees zero-tolerance data integrity for wallets and property bookings.
-
-### 1. Schema & Data Integrity (`sql/`)
-* **Strict Constraints:** `CHECK` constraints prevent negative wallet balances (`wallet_balance >= 0.00`) and enforce realistic geographic boundaries (`latitude >= -90`, `longitude >= -180`).
-* **Partial Unique Indexing:** A specialized index (`idx_active_stay`) prevents double-booking by ensuring a guest can only have one `CHECKED_IN` status at a time.
-* **Automated Auditing:** A trigger function (`trg_wallet_balance_audit`) automatically monitors the `guests` table, calculating balance differences on the fly to log `CREDIT` or `DEBIT` actions into an immutable `wallet_audit_logs` table.
-
-### 2. Transactional Logic
-* **Atomic Bookings (`04_stored_procedures.sql`):** The `create_booking` procedure handles the checkout flow. It atomically deducts funds and creates a booking, utilizing a graceful `ROLLBACK` and `RAISE NOTICE` exception block if a guest lacks sufficient funds.
-
-### 3. Analytics
-* **Materialized Views (`05_materialized_views.sql`):** Pre-computes total bookings and revenue per property. Includes a unique index (`idx_mv_property_summary_id`) and a `REFRESH CONCURRENTLY` procedural function for background updates without table locking.
-* **Window Functions (`06_window_analytics.sql`):** Uses Common Table Expressions (CTEs), a `CROSS JOIN` date generator, and a 7-day sliding window (`ROWS BETWEEN 6 PRECEDING AND CURRENT ROW`) to calculate accurate revenue momentum rankings per property.
-
----
-
-## MongoDB Architecture (Search & Analytics)
-
-The document schema handles heavy telemetry and unstructured review aggregation.
-
-### 1. Indexes (`mongo/01_collections_and_indexes.js`)
-* **Geospatial Optimization:** A `2dsphere` index is applied to the `SearchSessions.location` field for rapid Earth-spherical math.
-* **Automated Expiry:** A TTL (Time-To-Live) index automatically purges search sessions 2 hours (`7200` seconds) after their `created_at` timestamp.
-
-### 2. Analytical Workflows
-* **Workflow 3 - Geospatial Search (`02_workflow3_geonear.js`):** Utilizes a `$geoNear` aggregation pipeline to cluster recent user search sessions within a strict 5,000-meter radius of target coordinates.
-* **Workflow 4 - Review Faceting (`03_workflow4_facet.js`):** A `$facet` pipeline that simultaneously calculates overall average property ratings, rating distributions, and utilizes `$unwind` to extract and count the top 10 most frequent string tags from the `location_tags` array.
-
----
-
-## Execution & Testing Guide
-
-To evaluate this project locally, execute the following steps:
-
-### Phase 1: PostgreSQL Setup
-```bash
-createdb stayspot
-psql -d stayspot -f sql/01_schema_ddl.sql
-psql -d stayspot -f sql/02_indexes.sql
-psql -d stayspot -f sql/03_triggers_and_audit.sql
-psql -d stayspot -f sql/04_stored_procedures.sql
-psql -d stayspot -f sql/05_materialized_views.sql
-```
-
-### Phase 2: Data Generation
-
-Our memory-safe Python seeders utilize 10,000-record batch sizes to prevent memory buffer crashes while simulating massive data scale.  
-
-```bash 
-pip install -r requirements.txt
-python data_generation/postgres_seeder.py
-python data_generation/mongo_seeder.py
-```
-
-### Phase 3: MongoDB Setup & Workflows
+Node.js 22.12+ is required. After the database setup below:
 
 ```bash
-mongosh "mongodb://localhost:27017/stayspot" -f mongo/01_collections_and_indexes.js
-mongosh "mongodb://localhost:27017/stayspot" -f mongo/02_workflow3_geonear.js
-mongosh "mongodb://localhost:27017/stayspot" -f mongo/03_workflow4_facet.js
+npm ci
+npm run build
+npm start
 ```
 
-## Performance Proof
+Open http://127.0.0.1:3000. For development, npm run dev serves the UI at http://127.0.0.1:5173 and proxies /api to port 3000. The configured app is already running at port 3000 in this workspace. A .env.example is supplied; the ignored local .env points to the verified isolated services.
 
-To prove query optimization under heavy data loads, execution statistics have been captured for both databases.
+## Code sections for four members
 
-PostgreSQL: An EXPLAIN ANALYZE confirms the materialized view successfully executes an Index Scan using idx_mv_property_summary_id with an execution time of 0.739 ms. Please see below: 
+The code is organized under [members/](members/README.md), following the supplied responsibility/Figma-screen mapping. Each member folder contains their screens, route handlers, database scripts and existing tests. The current UI, stylesheet, endpoint contracts and root commands are preserved.
 
-EXPLAIN ANALYZE of Materialized view queries.
-EXPLAIN ANALYZE SELECT * FROM mv_property_summary WHERE property_id = 1;
+| Member | Assigned section | Figma screens |
+|---|---|---|
+| [Member 1](members/member1/README.md) | Browse, Property Details, shared React components and PostgreSQL schema | 00 Foundations & Users; 01 Browse; 02 Property Details |
+| [Member 2](members/member2/README.md) | Booking, Status Transition, Wallet Audit, procedure/index/trigger | 03 Transaction / Book Stay; 04 Booking Status & Constraint; 05 Wallet Audit Trail |
+| [Member 3](members/member3/README.md) | Analytics, window functions, Materialized View | 06 Analytics |
+| [Member 4](members/member4/README.md) | Map, Reviews, MongoDB pipelines | 07 Map / Search Hotspots; 08 Reviews & Amenities |
 
- Index Scan using idx_mv_property_summary_id on mv_property_summary (cost=0.28..8.29 rows=1 width=33) 
- (actual time=0.040..0.042 rows=1.00 loops=1)
- Index Cond: (property_id = 1)
- Index Searches: 1
- Buffers: shared hit=3
- Planning:
- Buffers: shared hit=61
- Planning Time: 1.473 ms
- Execution Time: 0.739 ms
+## Screens and technology choices
 
- --------------------------------------------------------------------------------------------------------
+| Screen | What works |
+|---|---|
+| Browse | Paged/searchable properties, guests and bookings, record details, status filters and booking status advancement |
+| Book a stay | DB-priced booking procedure, wallet before/after, real trigger audit entry, insufficient-funds and active-stay errors |
+| Audit trail | Read-only guest ledger, dates, opening/running balances and chronological microsecond-safe cursors |
+| Analytics | Part A CTE/window function, seven-day SVG chart, DENSE_RANK table, materialized totals and concurrent refresh timestamp/button |
+| Search map | Leaflet map, click/form-selected origin, 5 km circle, distance-sorted pins, full-candidate grid hotspots, 15-second polling and add-pin |
+| Reviews | Shared indexed $facet pipeline, five rating buckets, top tags, property average and readable flexible amenities catalog |
 
-  Incremental Sort  (cost=9574.41..265942.02 rows=400200 width=112) (actual time=80.315..1067.743 rows=732366.00 loops=1)
-   Sort Key: movingaverages.property_id, movingaverages.booking_date DESC
-   Presorted Key: movingaverages.property_id
-   Full-sort Groups: 2001  Sort Method: quicksort  Average Memory: 28kB  Peak Memory: 28kB
-   Pre-sorted Groups: 2001  Sort Method: quicksort  Average Memory: 44kB  Peak Memory: 44kB
-   Buffers: shared hit=1262
-   ->  WindowAgg  (cost=8311.29..238991.54 rows=400200 width=112) (actual time=79.420..960.839 rows=732366.00 loops=1)
-         Window: w1 AS (PARTITION BY movingaverages.property_id ORDER BY movingaverages.moving_avg_7d ROWS UNBOUNDED PRECEDING)
-         Storage: Memory  Maximum Storage: 17kB
-         Buffers: shared hit=1262
-         ->  Incremental Sort  (cost=8310.72..230987.54 rows=400200 width=72) (actual time=79.409..769.808 rows=732366.00 loops=1)
-               Sort Key: movingaverages.property_id, movingaverages.moving_avg_7d DESC
-               Presorted Key: movingaverages.property_id
-               Full-sort Groups: 2001  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
-               Pre-sorted Groups: 2001  Sort Method: quicksort  Average Memory: 38kB  Peak Memory: 38kB
-               Buffers: shared hit=1262
-               ->  Subquery Scan on movingaverages  (cost=7216.90..204037.06 rows=400200 width=72) (actual time=78.912..649.594 rows=732366.00 loops=1)
-                     Buffers: shared hit=1259
-                     ->  WindowAgg  (cost=7216.90..204037.06 rows=400200 width=72) (actual time=78.911..617.217 rows=732366.00 loops=1)
-                           Window: w1 AS (PARTITION BY p.id ORDER BY (((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date) ROWS BETWEEN '6'::bigint PRECEDING AND CURRENT ROW)
-                           Storage: Memory  Maximum Storage: 17kB
-                           Buffers: shared hit=1259
-                           ->  GroupAggregate  (cost=7216.41..197033.56 rows=400200 width=40) (actual time=78.900..338.943 rows=732366.00 loops=1)
-                                 Group Key: p.id, (((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date)
-                                 Buffers: shared hit=1259
-                                 ->  Merge Left Join  (cost=7216.41..177023.56 rows=2001000 width=14) (actual time=78.876..235.567 rows=734027.00 loops=1)
-                                       Merge Cond: ((p.id = b.property_id) AND ((((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date) = (date(b.created_at))))
-                                       Buffers: shared hit=1259
-                                       ->  Incremental Sort  (cost=2396.70..152196.56 rows=2001000 width=8) (actual time=44.008..139.834 rows=732366.00 loops=1)
-                                             Sort Key: p.id, (((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date)
-                                             Presorted Key: p.id
-                                             Full-sort Groups: 2001  Sort Method: quicksort  Average Memory: 26kB  Peak Memory: 26kB
-                                             Pre-sorted Groups: 2001  Sort Method: quicksort  Average Memory: 33kB  Peak Memory: 33kB
-                                             Buffers: shared hit=842
-                                             ->  Nested Loop  (cost=2334.33..27436.37 rows=2001000 width=8) (actual time=43.640..92.088 rows=732366.00 loops=1)
-                                                   Buffers: shared hit=842
-                                                   ->  Index Only Scan using properties_pkey on properties p  (cost=0.28..62.29 rows=2001 width=4) (actual time=0.023..0.294 rows=2001.00 loops=1)
-                                                         Heap Fetches: 0
-                                                         Index Searches: 1
-                                                         Buffers: shared hit=8
-                                                   ->  Materialize  (cost=2334.05..2364.07 rows=1000 width=4) (actual time=0.022..0.030 rows=366.00 loops=2001)
-                                                         Storage: Memory  Maximum Storage: 28kB
-                                                         Buffers: shared hit=834
-                                                         ->  Result  (cost=2334.05..2359.07 rows=1000 width=4) (actual time=43.601..43.767 rows=366.00 loops=1)
-                                                               Buffers: shared hit=834
-                                                               InitPlan 1
-                                                                 ->  Aggregate  (cost=1167.02..1167.03 rows=1 width=4) (actual time=26.890..26.891 rows=1.00 loops=1)
-                                                                       Buffers: shared hit=417
-                                                                       ->  Seq Scan on bookings  (cost=0.00..917.01 rows=50001 width=8) (actual time=0.028..10.223 rows=50002.00 loops=1)
-                                                                             Buffers: shared hit=417
-                                                               InitPlan 2
-                                                                 ->  Aggregate  (cost=1167.02..1167.03 rows=1 width=4) (actual time=16.277..16.277 rows=1.00 loops=1)
-                                                                       Buffers: shared hit=417
-                                                                       ->  Seq Scan on bookings bookings_1  (cost=0.00..917.01 rows=50001 width=8) (actual time=0.026..3.624 rows=50002.00 loops=1)
-                                                                             Buffers: shared hit=417
-                                                               ->  ProjectSet  (cost=0.00..5.02 rows=1000 width=8) (actual time=43.599..43.691 rows=366.00 loops=1)
-                                                                     Buffers: shared hit=834
-                                                                     ->  Result  (cost=0.00..0.01 rows=1 width=0) (actual time=0.001..0.001 rows=1.00 loops=1)
-                                       ->  Sort  (cost=4819.51..4944.51 rows=50001 width=18) (actual time=34.864..36.203 rows=50002.00 loops=1)
-                                             Sort Key: b.property_id, (date(b.created_at))
-                                             Sort Method: quicksort  Memory: 3710kB
-                                             Buffers: shared hit=417
-                                             ->  Seq Scan on bookings b  (cost=0.00..917.01 rows=50001 width=18) (actual time=0.007..12.479 rows=50002.00 loops=1)
-                                                   Buffers: shared hit=417
- Planning:
- Buffers: shared hit=177
- Planning Time: 6.707 ms
- Execution Time: 1090.849 ms
+The header switches demo actors through paged search; real login is not required. Every data view has loading, empty and error/retry states. The phone layout exposes all six destinations and stacks dense sections. Tables scroll within their panels when necessary.
 
-MongoDB: Raw output from .explain("executionStats") is documented in performance/mongo_execution_stats.json. It confirms that Workflow 3 successfully bypassed a collection scan, utilized the GEO_NEAR_2DSPHERE stage, and executed in 56 milliseconds. Please see below:
+React + Vite provide reusable UI and a small static build. Express keeps the API simple and serves that build. pg and mongodb call the database workflows directly; financial logic stays in PostgreSQL. Leaflet provides map interaction, OpenStreetMap supplies attributed tiles, and inline SVG charts avoid an additional chart dependency. System fonts avoid external font downloads. The package lock fixes installed dependency versions.
 
-[
-  {
-    "workflow_3_geoNear_stats": {
-      "explainVersion": "1",
-      "stages": [
+[Handover note](docs/handover_note.md), [API sketch](docs/api_endpoints.md), [users/style](docs/design/users_and_style.md), [six pre-build wireframes](docs/design/), [Assignment 2 report](docs/assignment2_report.md), [browser evidence](docs/browser_verification.md).
+
+![Browse screen](docs/screenshots/01_browse.png)
+
+## Important tests
+
+```bash
+# npm test loads the ignored .env; tests use both real databases.
+npm test
+# With Python dependencies installed and .env exported:
+python tests/database_checks.py
+```
+
+Twelve API integration cases and eight database checks passed. They test booking success/failure, concurrent deductions, active check-in rollback/release, immutable audit, forged prices/invalid inputs, bounded pagination, precise ledger cursors, seven-day gaps/ties, geospatial bounds/live pins, facet counts/validators and materialized totals. API tests explicitly skip when database environment variables are missing; a skipped run is not represented as verification. Tests append a few dedicated test records; the initial seed independently meets assignment thresholds.
+
+[API test log](performance/api_test_results.txt), [database test log](performance/database_test_results.txt), [production build log](performance/build_results.txt).
+
+## Readable code and implementation notes
+
+[Code walkthrough](docs/code_walkthrough.md) and [verification notes](docs/readability_verification.md) explain the source files and the browser/API/database flow. Each source now has purpose comments, logical-block explanations and, for Python, function docstrings. Indentation follows .editorconfig and .prettierrc.json; long statements/state declarations are expanded. The UI and API contracts are preserved. Valid JSON files are explained in the guide rather than receiving invalid inline comments. Raw performance evidence and generated artifacts retain their original contents.
+
+## Assumptions and data model
+
+- Project 3 is StaySpot. Currency is INR; PostgreSQL uses exact numeric monetary fields.
+- A booking costs the property's current base_price × nights. It begins CONFIRMED or CHECKED_IN and progresses CONFIRMED → CHECKED_IN → COMPLETED. Only CHECKED_IN is unique per guest, exactly as the brief specifies; multiple confirmed reservations are allowed.
+- Nights are explicit (1–365). Gross booked revenue includes all listed statuses. Historical seeded bookings represent already-settled history before the demo wallet snapshot; the generated ledger itself comes from real, consistent wallet updates.
+- Revenue days are UTC. Six warm-up days and zero-filled dates produce true seven-day averages. DENSE_RANK compares properties on the same day, using unrounded averages.
+- MongoDB document IDs reference actual PostgreSQL guest/property IDs. This seeder preserves linkage, but MongoDB does not enforce cross-database foreign keys.
+- Geospatial origin coordinates are [longitude, latitude]; a strict 5 km query and explicit recency filter accompany a two-hour TTL. Hotspots use approximate grid cells, rather than DBSCAN. Reviews use integer stars and are scoped to the selected property over the past year.
+- The audit table rejects ordinary UPDATE/DELETE/TRUNCATE; a privileged database owner can bypass triggers. This is a local teaching demo, without real authentication, property/date availability, refunds or deployment migrations.
+
+## Clean-machine database setup
+
+Requires PostgreSQL 16 (client psql), MongoDB 7+ (mongosh), Python 3.11+, and optionally Docker Compose. The Docker daemon must be running. Run from this repository's root. The SQL scripts target an **empty database** and the seeders refuse a nonempty dataset; no existing database is silently deleted.
+
+```bash
+cp .env.example .env
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r data_generation/requirements.txt
+# macOS: start the installed Docker Desktop engine before running Compose.
+docker desktop start
+docker info
+docker compose up -d --wait
+bash scripts/setup.sh
+```
+
+The script loads .env, installs all six SQL files and the MongoDB validators/indexes, then seeds 1,000 guests, 2,000 properties, 50,000 bookings, 100,000 trigger audit entries, 500,000 city-clustered search sessions, 50,000 reviews and matching property catalogs. MongoDB setup runs before its seed data so validation is exercised during insertion. COPY/bulk batches keep memory bounded; errors exit unsuccessfully.
+
+If Compose reports that docker.sock does not exist, Docker Desktop is stopped. Start it with `docker desktop start` (or open Docker in Applications) and wait for `docker info` to succeed. The Python virtual environment does not start the Docker engine.
+
+If another MongoDB already uses port 27017, set `MONGO_PORT=27019` and `MONGO_URL=mongodb://127.0.0.1:27019` in .env. Compose and the app must use the same host port. `POSTGRES_PORT` similarly controls PostgreSQL's host port; update `DATABASE_URL` when changing it. Existing local database services do not need to be stopped.
+
+Compose uses MongoDB 7.0 because MongoDB 8 has a [documented incompatibility with Linux kernels 6.19 through 7.0.13](https://www.mongodb.com/docs/manual/release-notes/8.0/), including this Mac's Docker Desktop kernel 7.0.12. The pipeline features used by StaySpot are available in 7.0. Startup and integration-test verification of this Docker configuration are pending; the earlier native MongoDB 8 performance reports remain records of their original runs. The UI and API code are unchanged.
+
+For databases installed without Docker, create an empty PostgreSQL database and an empty MongoDB database, edit .env to their connection details, then run the same setup script. PostgreSQL must permit installing pg_trgm. Do not run both projects' default Docker port mappings simultaneously; use separate ports/database names or one chosen project at a time.
+
+The earlier isolated verification services use PostgreSQL port 55432, MongoDB port 27018, and separate stayspot_a1/stayspot_a2 databases. These databases and the Python verification environment live outside the submission folders and remain separate from Docker. Docker uses the .env.example defaults unless host ports are overridden in .env; on this Mac, Docker MongoDB uses port 27019 to avoid the existing local MongoDB on 27017.
+
+Search sessions intentionally expire after two hours. Before a later stress-test/demo, append fresh telemetry without resetting wallets:
+
+```bash
+set -a
+source .env
+set +a
+python scripts/replenish_sessions.py --count 500000
+```
+
+## Independent Part A workflows
+
+```bash
+set -a
+source .env
+set +a
+# Caller owns the transaction; on a failed CALL the entire transaction aborts.
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "BEGIN; CALL create_booking(1,1,1,'CONFIRMED',NULL); COMMIT;"
+# Workflow 2 uses the same SQL function as the browser API.
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/06_window_analytics.sql
+psql "$DATABASE_URL" -c "SELECT refresh_property_summary();"
+mongosh "$MONGO_URL/$MONGO_DB" --quiet -f mongo/02_workflow3_geonear.js
+mongosh "$MONGO_URL/$MONGO_DB" --quiet -f mongo/03_workflow4_facet.js
+```
+
+Mongo shell scripts must run from the repository root because they load the shared pure builders in mongo/pipelines.cjs. Failed booking transactions preserve the original wallet and audit count. The corrected procedure signature is create_booking(guest_id, property_id, nights, starting_status, INOUT booking_id); caller-supplied total_cost was removed to prevent forged prices.
+
+## Verification and reports
+
+```bash
+set -a
+source .env
+set +a
+python scripts/capture_performance.py
+python tests/database_checks.py
+python scripts/build_reports.py
+```
+
+Eight live-database checks passed. The measured SQL workflow uses idx_bookings_property_date; MongoDB uses GEO_NEAR_2DSPHERE / IXSCAN and an indexed match before $facet. The original all-history and optimized bounded output differ in scope; the same-scope SQL comparison was separately verified for equal results. Reads do not force the optimizer by disabling sequential scans. A materialized refresh still processes the global source data.
+
+[Assignment 1 report and requirement audit](docs/assignment1_report.md), [ERD](docs/relational_erd.png), [MongoDB validators/map](docs/mongo_schema_map.json), [performance and complexity](docs/performance_and_complexity.md), [database test log](performance/database_test_results.txt).
+
+## Submission metadata and packaging
+
+Team numbers and member names/roll numbers still need filling. The responsibility and Figma-screen allocation below follows the supplied table; confirm actual personal contributions before submission.
+
+| Member | Roll number | Assigned Figma screens | Assigned code/test section |
+|---|---|---|---|
+| Member 1 — name pending | Pending | 00 Foundations & Users; 01 Browse; 02 Property Details | Browse, Property Details, shared React components, PostgreSQL schema |
+| Member 2 — name pending | Pending | 03 Transaction / Book Stay; 04 Booking Status & Constraint; 05 Wallet Audit Trail | Booking, Status Transition, Wallet Audit, procedure/index/trigger |
+| Member 3 — name pending | Pending | 06 Analytics | Analytics, window functions, Materialized View |
+| Member 4 — name pending | Pending | 07 Map / Search Hotspots; 08 Reviews & Amenities | Map, Reviews, MongoDB pipelines |
+
+Assignment 2 is published at https://github.com/anantreen/SSDAssignment1B with the inherited commits preserved. The original repository remains linked as the source/upstream. This is a separate GitHub repository retaining the source history; it is not represented as a GitHub-registered fork. Confirm the course's fork requirement and fill the remaining team identity fields before Moodle submission.
+
+The final packager requires a clean committed tree and stamps the exact source HEAD and supplied repository URL into the ZIP README. It excludes .git, node_modules, virtual environments, caches, build output, secrets and database dumps; it enforces a ZIP strictly below 20,000,000 bytes. A review archive can be made while metadata is pending; its name explicitly prevents confusion with a final submission.
+
+```bash
+python scripts/package_submission.py --assignment 2 --review
+# After filling metadata and committing, use the actual team/repository values:
+python scripts/package_submission.py --assignment 2 --team YOUR_TEAM_NUMBER --repo-url https://github.com/anantreen/SSDAssignment1B
+```
+
+The final filenames are <team>_a1.zip for Assignment 1 and <new_team>_a1b.zip for Assignment 2. Submit one correctly named ZIP to Moodle and prepare for the team's live viva. [Requirement audit](docs/requirements_checklist.md) records these remaining team-owned steps.
+
+## Executed performance proof
+
+Captured from real seeded databases with the default planner; no scan-forcing settings. Full logs are linked below. Workflow 2 covers five properties for 30 days (plus six warm-up days). Workflow 4 covers one property's past-year reviews. These scopes are explicit and are shared with the UI/API.
+
+```text
+SELECT * FROM revenue_analytics((CURRENT_TIMESTAMP AT TIME ZONE 'UTC')::date-29, (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')::date, ARRAY[1,2,3,4,5])
+Subquery Scan on revenue_analytics  (cost=734.58..736.45 rows=25 width=80) (actual time=0.243..0.305 rows=150 loops=1)
+  Output: revenue_analytics.property_id, revenue_analytics.booking_date, revenue_analytics.daily_total, revenue_analytics.moving_avg_7d, revenue_analytics.revenue_momentum_rank
+  Buffers: shared hit=23
+  ->  Incremental Sort  (cost=734.58..736.20 rows=25 width=112) (actual time=0.243..0.297 rows=150 loops=1)
+        Output: moving.id, moving.day, moving.daily_total, (round(moving.moving_avg, 2)), (dense_rank() OVER (?)), moving.moving_avg
+        Sort Key: moving.day, moving.id
+        Presorted Key: moving.day
+        Full-sort Groups: 5  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
+        Buffers: shared hit=23
+        ->  WindowAgg  (cost=734.55..735.11 rows=25 width=112) (actual time=0.225..0.273 rows=150 loops=1)
+              Output: moving.id, moving.day, moving.daily_total, round(moving.moving_avg, 2), dense_rank() OVER (?), moving.moving_avg
+              Buffers: shared hit=23
+              ->  Sort  (cost=734.55..734.61 rows=25 width=72) (actual time=0.224..0.228 rows=150 loops=1)
+                    Output: moving.day, moving.moving_avg, moving.id, moving.daily_total
+                    Sort Key: moving.day, moving.moving_avg DESC
+                    Sort Method: quicksort  Memory: 31kB
+                    Buffers: shared hit=23
+                    ->  Subquery Scan on moving  (cost=458.97..733.97 rows=25 width=72) (actual time=0.102..0.202 rows=150 loops=1)
+                          Output: moving.day, moving.moving_avg, moving.id, moving.daily_total
+                          Filter: ((moving.day <= ((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date) AND (moving.day >= (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 29)))
+                          Rows Removed by Filter: 30
+                          Buffers: shared hit=23
+                          ->  WindowAgg  (cost=458.97..571.47 rows=5000 width=72) (actual time=0.098..0.172 rows=180 loops=1)
+                                Output: properties.id, ((d_1.d)::date), COALESCE(d.revenue, '0'::numeric), avg(COALESCE(d.revenue, '0'::numeric)) OVER (?)
+                                Buffers: shared hit=23
+                                ->  Sort  (cost=458.97..471.47 rows=5000 width=40) (actual time=0.093..0.098 rows=180 loops=1)
+                                      Output: properties.id, ((d_1.d)::date), d.revenue
+                                      Sort Key: properties.id, ((d_1.d)::date)
+                                      Sort Method: quicksort  Memory: 30kB
+                                      Buffers: shared hit=23
+                                      ->  Hash Left Join  (cost=22.69..151.78 rows=5000 width=40) (actual time=0.027..0.067 rows=180 loops=1)
+                                            Output: properties.id, (d_1.d)::date, d.revenue
+                                            Inner Unique: true
+                                            Hash Cond: ((properties.id = d.property_id) AND ((d_1.d)::date = d.day))
+                                            Buffers: shared hit=23
+                                            ->  Nested Loop  (cost=0.31..90.02 rows=5000 width=12) (actual time=0.007..0.024 rows=180 loops=1)
+                                                  Output: properties.id, d_1.d
+                                                  Buffers: shared hit=11
+                                                  ->  Function Scan on pg_catalog.generate_series d_1  (cost=0.03..10.03 rows=1000 width=8) (actual time=0.005..0.006 rows=36 loops=1)
+                                                        Output: d_1.d
+                                                        Function Call: generate_series((((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 29) - 6))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)
+                                                  ->  Materialize  (cost=0.28..17.50 rows=5 width=4) (actual time=0.000..0.000 rows=5 loops=36)
+                                                        Output: properties.id
+                                                        Buffers: shared hit=11
+                                                        ->  Index Only Scan using properties_pkey on public.properties  (cost=0.28..17.48 rows=5 width=4) (actual time=0.001..0.003 rows=5 loops=1)
+                                                              Output: properties.id
+                                                              Index Cond: (properties.id = ANY ('{1,2,3,4,5}'::integer[]))
+                                                              Heap Fetches: 0
+                                                              Buffers: shared hit=11
+                                            ->  Hash  (cost=22.21..22.21 rows=12 width=40) (actual time=0.019..0.019 rows=14 loops=1)
+                                                  Output: d.revenue, d.property_id, d.day
+                                                  Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                  Buffers: shared hit=12
+                                                  ->  Subquery Scan on d  (cost=21.88..22.21 rows=12 width=40) (actual time=0.015..0.017 rows=14 loops=1)
+                                                        Output: d.revenue, d.property_id, d.day
+                                                        Buffers: shared hit=12
+                                                        ->  HashAggregate  (cost=21.88..22.09 rows=12 width=40) (actual time=0.015..0.016 rows=14 loops=1)
+                                                              Output: b.property_id, (((b.created_at AT TIME ZONE 'UTC'::text))::date), sum(b.total_cost)
+                                                              Group Key: b.property_id, ((b.created_at AT TIME ZONE 'UTC'::text))::date
+                                                              Batches: 1  Memory Usage: 24kB
+                                                              Buffers: shared hit=12
+                                                              ->  Index Only Scan using idx_bookings_property_date on public.bookings b  (cost=0.32..21.79 rows=12 width=14) (actual time=0.003..0.010 rows=27 loops=1)
+                                                                    Output: b.property_id, ((b.created_at AT TIME ZONE 'UTC'::text))::date, b.total_cost
+                                                                    Index Cond: ((b.property_id = ANY ('{1,2,3,4,5}'::integer[])) AND (b.created_at >= ((((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 29) - 6))::timestamp without time zone AT TIME ZONE 'UTC'::text)) AND (b.created_at < (((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date + 1))::timestamp without time zone AT TIME ZONE 'UTC'::text)))
+                                                                    Heap Fetches: 13
+                                                                    Buffers: shared hit=12
+Planning Time: 0.205 ms
+Execution Time: 0.329 ms
+
+```
+
+Workflow 3 cursor excerpt from explain("executionStats"):
+
+```json
+{
+  "queryPlanner": {
+    "winningPlan": {
+      "isCached": false,
+      "stage": "GEO_NEAR_2DSPHERE",
+      "keyPattern": {
+        "location": "2dsphere",
+        "created_at": -1
+      },
+      "indexName": "idx_sessions_geo_recent",
+      "indexVersion": 2,
+      "inputStages": [
         {
-          "$geoNearCursor": {
-            "queryPlanner": {
-              "namespace": "stayspot.SearchSessions",
-              "parsedQuery": {
-                "location": {
-                  "$nearSphere": {
-                    "type": "Point",
-                    "coordinates": [
-                      77.3231,
-                      28.5703
-                    ]
-                  },
-                  "$maxDistance": 5000
-                }
-              },
-              "indexFilterSet": false,
-              "queryHash": "F1E00857",
-              "planCacheShapeHash": "F1E00857",
-              "planCacheKey": "3BBD05AB",
-              "optimizationTimeMillis": 0,
-              "cursorType": "regular",
-              "maxIndexedOrSolutionsReached": false,
-              "maxIndexedAndSolutionsReached": false,
-              "maxScansToExplodeReached": false,
-              "prunedSimilarIndexes": false,
-              "winningPlan": {
-                "isCached": false,
-                "stage": "GEO_NEAR_2DSPHERE",
-                "nss": "stayspot.SearchSessions",
-                "keyPattern": {
-                  "location": "2dsphere"
-                },
-                "indexName": "location_2dsphere",
-                "indexVersion": 2,
-                "inputStage": {
-                  "stage": "FETCH",
-                  "inputStage": {
-                    "stage": "IXSCAN",
-                    "keyPattern": {
-                      "location": "2dsphere"
-                    },
-                    "indexName": "location_2dsphere",
-                    "isMultiKey": false,
-                    "multiKeyPaths": {
-                      "location": []
-                    },
-                    "isUnique": false,
-                    "isSparse": false,
-                    "isPartial": false,
-                    "indexVersion": 2,
-                    "direction": "forward",
-                    "indexBounds": {
-                      "location": [
-                        "[4107282860161892352, 4107282860161892352]",
-                        "[4110660559882420224, 4110660559882420224]",
-                        "[4110871666114953216, 4110871666114953216]",
-                        "[4110910149021925376, 4110910149021925376]",
-                        "[4110910423899832320, 4110910423899832320]",
-                        "[4110910561338785793, 4110910698777739263]",
-                        "[4110910698777739265, 4110910836216692735]",
-                        "[4110910973655646208, 4110910973655646208]",
-                        "[4110911111094599681, 4110911248533553151]",
-                        "[4110911248533553152, 4110911248533553152]",
-                        "[4110911248533553153, 4110911798289367039]",
-                        "[4110911798289367041, 4110911935728320511]",
-                        "[4110911935728320513, 4110912073167273983]",
-                        "[4110912073167273984, 4110912073167273984]",
-                        "[4110912073167273985, 4110912107527012351]",
-                        "[4110912141886750720, 4110912141886750720]",
-                        "[4110912176246489089, 4110912210606227455]",
-                        "[4110912210606227457, 4110912348045180927]",
-                        "[4110912348045180928, 4110912348045180928]",
-                        "[4110912348045180929, 4110912485484134399]",
-                        "[4110912485484134401, 4110912519843872767]",
-                        "[4110912554203611136, 4110912554203611136]",
-                        "[4110912622923087872, 4110912622923087872]",
-                        "[4110912760362041345, 4110912897800994815]",
-                        "[4110912897800994817, 4110913447556808703]",
-                        "[4110913481916547073, 4110913516276285439]",
-                        "[4110913516276285440, 4110913516276285440]",
-                        "[4110913722434715648, 4110913722434715648]",
-                        "[4110913859873669121, 4110913997312622591]",
-                        "[4110913997312622593, 4110914134751576063]",
-                        "[4110914134751576065, 4110914272190529535]",
-                        "[4110914272190529536, 4110914272190529536]",
-                        "[4110914547068436480, 4110914547068436480]",
-                        "[4110924442673086464, 4110924442673086464]",
-                        "[4110942034859130880, 4110942034859130880]",
-                        "[4111786459789262848, 4111786459789262848]",
-                        "[4125297258671374336, 4125297258671374336]"
-                      ]
-                    }
-                  }
-                }
-              },
-              "rejectedPlans": []
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
             },
-            "executionStats": {
-              "executionSuccess": true,
-              "nReturned": 0,
-              "executionTimeMillis": 1,
-              "totalKeysExamined": 6,
-              "totalDocsExamined": 0,
-              "executionStages": {
-                "isCached": false,
-                "stage": "GEO_NEAR_2DSPHERE",
-                "nReturned": 0,
-                "executionTimeMillisEstimate": 0,
-                "works": 23,
-                "advanced": 0,
-                "needTime": 22,
-                "needYield": 0,
-                "saveState": 2,
-                "restoreState": 1,
-                "isEOF": 1,
-                "nss": "stayspot.SearchSessions",
-                "keyPattern": {
-                  "location": "2dsphere"
-                },
-                "indexName": "location_2dsphere",
-                "indexVersion": 2,
-                "searchIntervals": [
-                  {
-                    "minDistance": 0,
-                    "maxDistance": 5000,
-                    "maxInclusive": true,
-                    "nBuffered": 0,
-                    "nReturned": 0
-                  }
-                ],
-                "usedDisk": false,
-                "spills": 0,
-                "spilledRecords": 0,
-                "spilledBytes": 0,
-                "spilledDataStorageSize": 0,
-                "inputStage": {
-                  "stage": "FETCH",
-                  "nReturned": 0,
-                  "executionTimeMillisEstimate": 0,
-                  "works": 6,
-                  "advanced": 0,
-                  "needTime": 5,
-                  "needYield": 0,
-                  "saveState": 1,
-                  "restoreState": 0,
-                  "isEOF": 1,
-                  "docsExamined": 0,
-                  "alreadyHasObj": 0,
-                  "inputStage": {
-                    "stage": "IXSCAN",
-                    "nReturned": 0,
-                    "executionTimeMillisEstimate": 0,
-                    "works": 6,
-                    "advanced": 0,
-                    "needTime": 5,
-                    "needYield": 0,
-                    "saveState": 1,
-                    "restoreState": 0,
-                    "isEOF": 1,
-                    "keyPattern": {
-                      "location": "2dsphere"
-                    },
-                    "indexName": "location_2dsphere",
-                    "isMultiKey": false,
-                    "multiKeyPaths": {
-                      "location": []
-                    },
-                    "isUnique": false,
-                    "isSparse": false,
-                    "isPartial": false,
-                    "indexVersion": 2,
-                    "direction": "forward",
-                    "indexBounds": {
-                      "location": [
-                        "[4107282860161892352, 4107282860161892352]",
-                        "[4110660559882420224, 4110660559882420224]",
-                        "[4110871666114953216, 4110871666114953216]",
-                        "[4110910149021925376, 4110910149021925376]",
-                        "[4110910423899832320, 4110910423899832320]",
-                        "[4110910561338785793, 4110910698777739263]",
-                        "[4110910698777739265, 4110910836216692735]",
-                        "[4110910973655646208, 4110910973655646208]",
-                        "[4110911111094599681, 4110911248533553151]",
-                        "[4110911248533553152, 4110911248533553152]",
-                        "[4110911248533553153, 4110911798289367039]",
-                        "[4110911798289367041, 4110911935728320511]",
-                        "[4110911935728320513, 4110912073167273983]",
-                        "[4110912073167273984, 4110912073167273984]",
-                        "[4110912073167273985, 4110912107527012351]",
-                        "[4110912141886750720, 4110912141886750720]",
-                        "[4110912176246489089, 4110912210606227455]",
-                        "[4110912210606227457, 4110912348045180927]",
-                        "[4110912348045180928, 4110912348045180928]",
-                        "[4110912348045180929, 4110912485484134399]",
-                        "[4110912485484134401, 4110912519843872767]",
-                        "[4110912554203611136, 4110912554203611136]",
-                        "[4110912622923087872, 4110912622923087872]",
-                        "[4110912760362041345, 4110912897800994815]",
-                        "[4110912897800994817, 4110913447556808703]",
-                        "[4110913481916547073, 4110913516276285439]",
-                        "[4110913516276285440, 4110913516276285440]",
-                        "[4110913722434715648, 4110913722434715648]",
-                        "[4110913859873669121, 4110913997312622591]",
-                        "[4110913997312622593, 4110914134751576063]",
-                        "[4110914134751576065, 4110914272190529535]",
-                        "[4110914272190529536, 4110914272190529536]",
-                        "[4110914547068436480, 4110914547068436480]",
-                        "[4110924442673086464, 4110924442673086464]",
-                        "[4110942034859130880, 4110942034859130880]",
-                        "[4111786459789262848, 4111786459789262848]",
-                        "[4125297258671374336, 4125297258671374336]"
-                      ]
-                    },
-                    "keysExamined": 6,
-                    "seeks": 6,
-                    "dupsTested": 0,
-                    "dupsDropped": 0,
-                    "peakTrackedMemBytes": 0
-                  }
-                }
-              }
-            }
-          },
-          "nReturned": 0,
-          "executionTimeMillisEstimate": 1
-        },
-        {
-          "$project": {
-            "location": true,
-            "created_at": true,
-            "distance_meters": {
-              "$round": [
-                "$distance_meters",
-                {
-                  "$const": 2
-                }
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706576471949312, 4308706576471949312]",
+                "[4308706576522280960, 4308706576522280960]",
+                "[4308706576533815296, 4308706576533815296]",
+                "[4308706576534077440, 4308706576534077440]",
+                "[4308706576534077441, 4308706576534110207]",
+                "[4308706576534142976, 4308706576534142976]",
+                "[4308706576534142977, 4308706576534175743]",
+                "[4308706576534175745, 4308706576534208511]",
+                "[4308706576534208513, 4308706576534339583]",
+                "[4308706576534339585, 4308706576534470655]",
+                "[4308706576534601728, 4308706576534601728]",
+                "[4308706576534798336, 4308706576534798336]",
+                "[4308706576534798337, 4308706576534831103]",
+                "[4308706576534863872, 4308706576534863872]",
+                "[4308706576534896641, 4308706576534929407]",
+                "[4308706576534929408, 4308706576534929408]",
+                "[4308706576534929409, 4308706576534962175]",
+                "[4308706576535060480, 4308706576535060480]",
+                "[4308706576535093249, 4308706576535126015]",
+                "[4308706576535126016, 4308706576535126016]",
+                "[4308706576535126017, 4308706576535257087]",
+                "[4308706576535257089, 4308706576535388159]",
+                "[4308706576535388161, 4308706576535519231]",
+                "[4308706576535519233, 4308706576535650303]",
+                "[4308706576535650304, 4308706576535650304]",
+                "[4308706576535650305, 4308706576535683071]",
+                "[4308706576535683073, 4308706576535715839]",
+                "[4308706576535715840, 4308706576535715840]",
+                "[4308706576535748609, 4308706576535781375]",
+                "[4308706576535781377, 4308706576535912447]",
+                "[4308706576535912448, 4308706576535912448]",
+                "[4308706576673275904, 4308706576673275904]",
+                "[4308706577478582272, 4308706577478582272]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
               ]
-            },
-            "_id": false
-          },
-          "nReturned": 0,
-          "executionTimeMillisEstimate": 1
+            }
+          }
         },
         {
-          "$sort": {
-            "sortKey": {
-              "distance_meters": 1
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
             },
-            "limit": 100
-          },
-          "totalDataSizeSortedBytesEstimate": 0,
-          "usedDisk": false,
-          "spills": 0,
-          "spilledBytes": 0,
-          "spilledRecords": 0,
-          "spilledDataStorageSize": 0,
-          "nReturned": 0,
-          "executionTimeMillisEstimate": 1,
-          "peakTrackedMemBytes": 0
-        }
-      ],
-      "queryShapeHash": "CE5AE6D68E66B31B47A8A0A54FF15581078C76818844799990E7248DE6AB0D38",
-      "serverInfo": {
-        "host": "Anujs-MacBook-Air.local",
-        "port": 27017,
-        "version": "8.3.7",
-        "gitVersion": "34eee04f34989abb7a3d91447976f033f4f74af2"
-      },
-      "serverParameters": {
-        "internalQueryFacetBufferSizeBytes": 104857600,
-        "internalDocumentSourceGroupMaxMemoryBytes": 104857600,
-        "internalQueryMaxBlockingSortMemoryUsageBytes": 104857600,
-        "internalDocumentSourceSetWindowFieldsMaxMemoryBytes": 104857600,
-        "internalQueryFacetMaxOutputDocSizeBytes": 104857600,
-        "internalLookupStageIntermediateDocumentMaxSizeBytes": 104857600,
-        "internalQueryProhibitBlockingMergeOnMongoS": 0,
-        "internalQueryMaxAddToSetBytes": 104857600,
-        "internalQueryFrameworkControl": "trySbeRestricted",
-        "internalQueryPlannerIgnoreIndexWithCollationForRegex": 1
-      },
-      "command": {
-        "aggregate": "SearchSessions",
-        "pipeline": [
-          {
-            "$geoNear": {
-              "near": {
-                "type": "Point",
-                "coordinates": [
-                  77.3231,
-                  28.5703
-                ]
-              },
-              "distanceField": "distance_meters",
-              "maxDistance": 5000,
-              "spherical": true
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706576471949312, 4308706576471949312]",
+                "[4308706576507600897, 4308706576509698047]",
+                "[4308706576509698048, 4308706576509698048]",
+                "[4308706576509960192, 4308706576509960192]",
+                "[4308706576509960193, 4308706576510091263]",
+                "[4308706576510091265, 4308706576510222335]",
+                "[4308706576510222337, 4308706576510746623]",
+                "[4308706576510746624, 4308706576510746624]",
+                "[4308706576510746625, 4308706576511270911]",
+                "[4308706576522280960, 4308706576522280960]",
+                "[4308706576531718144, 4308706576531718144]",
+                "[4308706576531718145, 4308706576532242431]",
+                "[4308706576532242433, 4308706576532373503]",
+                "[4308706576532504576, 4308706576532504576]",
+                "[4308706576532766721, 4308706576533291007]",
+                "[4308706576533291009, 4308706576533815295]",
+                "[4308706576533815296, 4308706576533815296]",
+                "[4308706576533815297, 4308706576533946367]",
+                "[4308706576533946369, 4308706576534077439]",
+                "[4308706576534077440, 4308706576534077440]",
+                "[4308706576534110209, 4308706576534142975]",
+                "[4308706576534142976, 4308706576534142976]",
+                "[4308706576534470657, 4308706576534601727]",
+                "[4308706576534601728, 4308706576534601728]",
+                "[4308706576534601729, 4308706576534732799]",
+                "[4308706576534732801, 4308706576534765567]",
+                "[4308706576534765569, 4308706576534798335]",
+                "[4308706576534798336, 4308706576534798336]",
+                "[4308706576534831105, 4308706576534863871]",
+                "[4308706576534863872, 4308706576534863872]",
+                "[4308706576534863873, 4308706576534896639]",
+                "[4308706576534929408, 4308706576534929408]",
+                "[4308706576534962177, 4308706576534994943]",
+                "[4308706576534994945, 4308706576535027711]",
+                "[4308706576535027713, 4308706576535060479]",
+                "[4308706576535060480, 4308706576535060480]",
+                "[4308706576535060481, 4308706576535093247]",
+                "[4308706576535126016, 4308706576535126016]",
+                "[4308706576535650304, 4308706576535650304]",
+                "[4308706576535715840, 4308706576535715840]",
+                "[4308706576535715841, 4308706576535748607]",
+                "[4308706576535912448, 4308706576535912448]",
+                "[4308706576535912449, 4308706576536436735]",
+                "[4308706576536436737, 4308706576536961023]",
+                "[4308706576536961025, 4308706576537485311]",
+                "[4308706576537485313, 4308706576538009599]",
+                "[4308706576538009600, 4308706576538009600]",
+                "[4308706576543252480, 4308706576543252480]",
+                "[4308706576546398208, 4308706576546398208]",
+                "[4308706576546398209, 4308706576546922495]",
+                "[4308706576546922497, 4308706576547053567]",
+                "[4308706576547184640, 4308706576547184640]",
+                "[4308706576547315713, 4308706576547446783]",
+                "[4308706576555835392, 4308706576555835392]",
+                "[4308706576606167040, 4308706576606167040]",
+                "[4308706576673275904, 4308706576673275904]",
+                "[4308706577478582272, 4308706577478582272]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
             }
-          },
-          {
-            "$project": {
-              "_id": 0,
-              "location": 1,
-              "distance_meters": {
-                "$round": [
-                  "$distance_meters",
-                  2
-                ]
-              },
-              "created_at": 1
-            }
-          },
-          {
-            "$sort": {
-              "distance_meters": 1
-            }
-          },
-          {
-            "$limit": 100
           }
-        ],
-        "cursor": {},
-        "$db": "stayspot"
-      },
-      "ok": 1
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706576471949312, 4308706576471949312]",
+                "[4308706576488726528, 4308706576488726528]",
+                "[4308706576501309440, 4308706576501309440]",
+                "[4308706576502358016, 4308706576502358016]",
+                "[4308706576502882305, 4308706576503406591]",
+                "[4308706576503406593, 4308706576503930879]",
+                "[4308706576504455168, 4308706576504455168]",
+                "[4308706576505503745, 4308706576507600895]",
+                "[4308706576509698048, 4308706576509698048]",
+                "[4308706576509698049, 4308706576509829119]",
+                "[4308706576509829121, 4308706576509960191]",
+                "[4308706576509960192, 4308706576509960192]",
+                "[4308706576510746624, 4308706576510746624]",
+                "[4308706576511270913, 4308706576511795199]",
+                "[4308706576511795201, 4308706576513892351]",
+                "[4308706576513892353, 4308706576515989503]",
+                "[4308706576518086656, 4308706576518086656]",
+                "[4308706576518086657, 4308706576520183807]",
+                "[4308706576520183809, 4308706576522280959]",
+                "[4308706576522280960, 4308706576522280960]",
+                "[4308706576522280961, 4308706576530669567]",
+                "[4308706576530669569, 4308706576531193855]",
+                "[4308706576531193857, 4308706576531718143]",
+                "[4308706576531718144, 4308706576531718144]",
+                "[4308706576532373505, 4308706576532504575]",
+                "[4308706576532504576, 4308706576532504576]",
+                "[4308706576532504577, 4308706576532635647]",
+                "[4308706576532635649, 4308706576532766719]",
+                "[4308706576534863872, 4308706576534863872]",
+                "[4308706576538009600, 4308706576538009600]",
+                "[4308706576538009601, 4308706576538533887]",
+                "[4308706576538533889, 4308706576539058175]",
+                "[4308706576539058177, 4308706576541155327]",
+                "[4308706576541155329, 4308706576541679615]",
+                "[4308706576542203904, 4308706576542203904]",
+                "[4308706576542728193, 4308706576543252479]",
+                "[4308706576543252480, 4308706576543252480]",
+                "[4308706576543252481, 4308706576545349631]",
+                "[4308706576545349633, 4308706576545873919]",
+                "[4308706576545873921, 4308706576546398207]",
+                "[4308706576546398208, 4308706576546398208]",
+                "[4308706576547053569, 4308706576547184639]",
+                "[4308706576547184640, 4308706576547184640]",
+                "[4308706576547184641, 4308706576547315711]",
+                "[4308706576547446785, 4308706576549543935]",
+                "[4308706576549543937, 4308706576551641087]",
+                "[4308706576551641088, 4308706576551641088]",
+                "[4308706576553738241, 4308706576555835391]",
+                "[4308706576555835392, 4308706576555835392]",
+                "[4308706576606167040, 4308706576606167040]",
+                "[4308706576673275904, 4308706576673275904]",
+                "[4308706577478582272, 4308706577478582272]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308706596805935104, 4308706596805935104]",
+                "[4308706597611241472, 4308706597611241472]",
+                "[4308706597678350336, 4308706597678350336]",
+                "[4308706597728681984, 4308706597728681984]",
+                "[4308706597741264896, 4308706597741264896]",
+                "[4308706597743362049, 4308706597745459199]",
+                "[4308706597745459201, 4308706597747556351]",
+                "[4308706597749653504, 4308706597749653504]",
+                "[4308706597751750657, 4308706597753847807]",
+                "[4308706597753847809, 4308706597755944959]",
+                "[4308706597758042112, 4308706597758042112]",
+                "[4308706597762236416, 4308706597762236416]",
+                "[4308706597812568064, 4308706597812568064]",
+                "[4308706600027160576, 4308706600027160576]",
+                "[4308706604322127872, 4308706604322127872]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706576413229057, 4308706576421617663]",
+                "[4308706576421617664, 4308706576421617664]",
+                "[4308706576421617665, 4308706576430006271]",
+                "[4308706576455172096, 4308706576455172096]",
+                "[4308706576463560705, 4308706576471949311]",
+                "[4308706576471949312, 4308706576471949312]",
+                "[4308706576471949313, 4308706576480337919]",
+                "[4308706576480337921, 4308706576488726527]",
+                "[4308706576488726528, 4308706576488726528]",
+                "[4308706576488726529, 4308706576497115135]",
+                "[4308706576497115137, 4308706576499212287]",
+                "[4308706576499212289, 4308706576501309439]",
+                "[4308706576501309440, 4308706576501309440]",
+                "[4308706576501309441, 4308706576501833727]",
+                "[4308706576501833729, 4308706576502358015]",
+                "[4308706576502358016, 4308706576502358016]",
+                "[4308706576502358017, 4308706576502882303]",
+                "[4308706576503930881, 4308706576504455167]",
+                "[4308706576504455168, 4308706576504455168]",
+                "[4308706576504455169, 4308706576504979455]",
+                "[4308706576504979457, 4308706576505503743]",
+                "[4308706576515989505, 4308706576518086655]",
+                "[4308706576518086656, 4308706576518086656]",
+                "[4308706576522280960, 4308706576522280960]",
+                "[4308706576541679617, 4308706576542203903]",
+                "[4308706576542203904, 4308706576542203904]",
+                "[4308706576542203905, 4308706576542728191]",
+                "[4308706576543252480, 4308706576543252480]",
+                "[4308706576551641088, 4308706576551641088]",
+                "[4308706576551641089, 4308706576553738239]",
+                "[4308706576555835392, 4308706576555835392]",
+                "[4308706576555835393, 4308706576564223999]",
+                "[4308706576564224001, 4308706576572612607]",
+                "[4308706576572612609, 4308706576581001215]",
+                "[4308706576589389824, 4308706576589389824]",
+                "[4308706576606167040, 4308706576606167040]",
+                "[4308706576648110081, 4308706576656498687]",
+                "[4308706576656498688, 4308706576656498688]",
+                "[4308706576656498689, 4308706576664887295]",
+                "[4308706576664887297, 4308706576666984447]",
+                "[4308706576666984449, 4308706576669081599]",
+                "[4308706576669081600, 4308706576669081600]",
+                "[4308706576673275904, 4308706576673275904]",
+                "[4308706577478582272, 4308706577478582272]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308706596805935104, 4308706596805935104]",
+                "[4308706597611241472, 4308706597611241472]",
+                "[4308706597678350336, 4308706597678350336]",
+                "[4308706597711904769, 4308706597720293375]",
+                "[4308706597720293377, 4308706597728681983]",
+                "[4308706597728681984, 4308706597728681984]",
+                "[4308706597728681985, 4308706597737070591]",
+                "[4308706597737070593, 4308706597739167743]",
+                "[4308706597739167745, 4308706597741264895]",
+                "[4308706597741264896, 4308706597741264896]",
+                "[4308706597741264897, 4308706597743362047]",
+                "[4308706597747556353, 4308706597749653503]",
+                "[4308706597749653504, 4308706597749653504]",
+                "[4308706597749653505, 4308706597751750655]",
+                "[4308706597755944961, 4308706597758042111]",
+                "[4308706597758042112, 4308706597758042112]",
+                "[4308706597758042113, 4308706597760139263]",
+                "[4308706597760139265, 4308706597762236415]",
+                "[4308706597762236416, 4308706597762236416]",
+                "[4308706597762236417, 4308706597770625023]",
+                "[4308706597770625025, 4308706597779013631]",
+                "[4308706597812568064, 4308706597812568064]",
+                "[4308706597858705408, 4308706597858705408]",
+                "[4308706597859753984, 4308706597859753984]",
+                "[4308706597859753985, 4308706597860278271]",
+                "[4308706597862899712, 4308706597862899712]",
+                "[4308706597862899713, 4308706597871288319]",
+                "[4308706600027160576, 4308706600027160576]",
+                "[4308706604322127872, 4308706604322127872]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706575331098624, 4308706575331098624]",
+                "[4308706576136404992, 4308706576136404992]",
+                "[4308706576203513856, 4308706576203513856]",
+                "[4308706576253845504, 4308706576253845504]",
+                "[4308706576262234113, 4308706576270622719]",
+                "[4308706576270622721, 4308706576304177151]",
+                "[4308706576337731584, 4308706576337731584]",
+                "[4308706576371286017, 4308706576404840447]",
+                "[4308706576404840449, 4308706576413229055]",
+                "[4308706576421617664, 4308706576421617664]",
+                "[4308706576430006273, 4308706576438394879]",
+                "[4308706576438394881, 4308706576446783487]",
+                "[4308706576446783489, 4308706576455172095]",
+                "[4308706576455172096, 4308706576455172096]",
+                "[4308706576455172097, 4308706576463560703]",
+                "[4308706576471949312, 4308706576471949312]",
+                "[4308706576581001217, 4308706576589389823]",
+                "[4308706576589389824, 4308706576589389824]",
+                "[4308706576589389825, 4308706576597778431]",
+                "[4308706576597778433, 4308706576606167039]",
+                "[4308706576606167040, 4308706576606167040]",
+                "[4308706576606167041, 4308706576639721471]",
+                "[4308706576639721473, 4308706576648110079]",
+                "[4308706576656498688, 4308706576656498688]",
+                "[4308706576669081600, 4308706576669081600]",
+                "[4308706576669081601, 4308706576671178751]",
+                "[4308706576671178753, 4308706576673275903]",
+                "[4308706576673275904, 4308706576673275904]",
+                "[4308706576673275905, 4308706576807493631]",
+                "[4308706576807493633, 4308706576941711359]",
+                "[4308706577478582272, 4308706577478582272]",
+                "[4308706578283888640, 4308706578283888640]",
+                "[4308706578317443073, 4308706578350997503]",
+                "[4308706578350997504, 4308706578350997504]",
+                "[4308706578350997505, 4308706578384551935]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308706595899965441, 4308706595933519871]",
+                "[4308706595933519872, 4308706595933519872]",
+                "[4308706595944529921, 4308706595945054207]",
+                "[4308706595945054208, 4308706595945054208]",
+                "[4308706595946102784, 4308706595946102784]",
+                "[4308706595950297088, 4308706595950297088]",
+                "[4308706596000628736, 4308706596000628736]",
+                "[4308706596805935104, 4308706596805935104]",
+                "[4308706597393137664, 4308706597393137664]",
+                "[4308706597393137665, 4308706597401526271]",
+                "[4308706597409914880, 4308706597409914880]",
+                "[4308706597409914881, 4308706597443469311]",
+                "[4308706597544132608, 4308706597544132608]",
+                "[4308706597560909824, 4308706597560909824]",
+                "[4308706597573492736, 4308706597573492736]",
+                "[4308706597575589889, 4308706597577687039]",
+                "[4308706597577687041, 4308706597586075647]",
+                "[4308706597594464256, 4308706597594464256]",
+                "[4308706597602852865, 4308706597611241471]",
+                "[4308706597611241472, 4308706597611241472]",
+                "[4308706597611241473, 4308706597644795903]",
+                "[4308706597644795905, 4308706597678350335]",
+                "[4308706597678350336, 4308706597678350336]",
+                "[4308706597678350337, 4308706597711904767]",
+                "[4308706597779013633, 4308706597812568063]",
+                "[4308706597812568064, 4308706597812568064]",
+                "[4308706597812568065, 4308706597846122495]",
+                "[4308706597846122497, 4308706597854511103]",
+                "[4308706597854511105, 4308706597856608255]",
+                "[4308706597856608257, 4308706597858705407]",
+                "[4308706597858705408, 4308706597858705408]",
+                "[4308706597858705409, 4308706597859229695]",
+                "[4308706597859229697, 4308706597859753983]",
+                "[4308706597859753984, 4308706597859753984]",
+                "[4308706597860278273, 4308706597860802559]",
+                "[4308706597860802561, 4308706597862899711]",
+                "[4308706597862899712, 4308706597862899712]",
+                "[4308706597871288321, 4308706597879676927]",
+                "[4308706597879676929, 4308706597913231359]",
+                "[4308706597946785792, 4308706597946785792]",
+                "[4308706597997117440, 4308706597997117440]",
+                "[4308706597997117441, 4308706598005506047]",
+                "[4308706598148112384, 4308706598148112384]",
+                "[4308706598953418752, 4308706598953418752]",
+                "[4308706600027160576, 4308706600027160576]",
+                "[4308706604322127872, 4308706604322127872]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706574391574529, 4308706574525792255]",
+                "[4308706574525792256, 4308706574525792256]",
+                "[4308706574567735297, 4308706574576123903]",
+                "[4308706574576123904, 4308706574576123904]",
+                "[4308706574592901120, 4308706574592901120]",
+                "[4308706575331098624, 4308706575331098624]",
+                "[4308706575867969537, 4308706576002187263]",
+                "[4308706576002187265, 4308706576136404991]",
+                "[4308706576136404992, 4308706576136404992]",
+                "[4308706576136404993, 4308706576169959423]",
+                "[4308706576169959425, 4308706576203513855]",
+                "[4308706576203513856, 4308706576203513856]",
+                "[4308706576203513857, 4308706576237068287]",
+                "[4308706576237068289, 4308706576245456895]",
+                "[4308706576245456897, 4308706576253845503]",
+                "[4308706576253845504, 4308706576253845504]",
+                "[4308706576253845505, 4308706576262234111]",
+                "[4308706576304177153, 4308706576337731583]",
+                "[4308706576337731584, 4308706576337731584]",
+                "[4308706576337731585, 4308706576371286015]",
+                "[4308706576941711361, 4308706577075929087]",
+                "[4308706577210146816, 4308706577210146816]",
+                "[4308706577344364545, 4308706577478582271]",
+                "[4308706577478582272, 4308706577478582272]",
+                "[4308706577478582273, 4308706577612799999]",
+                "[4308706577747017728, 4308706577747017728]",
+                "[4308706578015453185, 4308706578149670911]",
+                "[4308706578149670913, 4308706578283888639]",
+                "[4308706578283888640, 4308706578283888640]",
+                "[4308706578283888641, 4308706578317443071]",
+                "[4308706578350997504, 4308706578350997504]",
+                "[4308706578384551937, 4308706578418106367]",
+                "[4308706578418106369, 4308706578552324095]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308706595732193281, 4308706595866411007]",
+                "[4308706595866411009, 4308706595899965439]",
+                "[4308706595933519872, 4308706595933519872]",
+                "[4308706595933519873, 4308706595941908479]",
+                "[4308706595941908481, 4308706595944005631]",
+                "[4308706595944005633, 4308706595944529919]",
+                "[4308706595945054208, 4308706595945054208]",
+                "[4308706595945054209, 4308706595945578495]",
+                "[4308706595945578497, 4308706595946102783]",
+                "[4308706595946102784, 4308706595946102784]",
+                "[4308706595946102785, 4308706595948199935]",
+                "[4308706595948199937, 4308706595950297087]",
+                "[4308706595950297088, 4308706595950297088]",
+                "[4308706595950297089, 4308706595958685695]",
+                "[4308706595958685697, 4308706595967074303]",
+                "[4308706595967074305, 4308706596000628735]",
+                "[4308706596000628736, 4308706596000628736]",
+                "[4308706596000628737, 4308706596134846463]",
+                "[4308706596134846465, 4308706596269064191]",
+                "[4308706596537499648, 4308706596537499648]",
+                "[4308706596671717377, 4308706596805935103]",
+                "[4308706596805935104, 4308706596805935104]",
+                "[4308706596805935105, 4308706596940152831]",
+                "[4308706597074370560, 4308706597074370560]",
+                "[4308706597208588289, 4308706597342806015]",
+                "[4308706597342806017, 4308706597376360447]",
+                "[4308706597376360449, 4308706597384749055]",
+                "[4308706597384749057, 4308706597393137663]",
+                "[4308706597393137664, 4308706597393137664]",
+                "[4308706597401526273, 4308706597409914879]",
+                "[4308706597409914880, 4308706597409914880]",
+                "[4308706597443469313, 4308706597477023743]",
+                "[4308706597477023745, 4308706597510578175]",
+                "[4308706597510578177, 4308706597544132607]",
+                "[4308706597544132608, 4308706597544132608]",
+                "[4308706597544132609, 4308706597552521215]",
+                "[4308706597552521217, 4308706597560909823]",
+                "[4308706597560909824, 4308706597560909824]",
+                "[4308706597560909825, 4308706597569298431]",
+                "[4308706597569298433, 4308706597571395583]",
+                "[4308706597571395585, 4308706597573492735]",
+                "[4308706597573492736, 4308706597573492736]",
+                "[4308706597573492737, 4308706597575589887]",
+                "[4308706597586075649, 4308706597594464255]",
+                "[4308706597594464256, 4308706597594464256]",
+                "[4308706597594464257, 4308706597602852863]",
+                "[4308706597611241472, 4308706597611241472]",
+                "[4308706597913231361, 4308706597946785791]",
+                "[4308706597946785792, 4308706597946785792]",
+                "[4308706597946785793, 4308706597980340223]",
+                "[4308706597980340225, 4308706597988728831]",
+                "[4308706597988728833, 4308706597997117439]",
+                "[4308706597997117440, 4308706597997117440]",
+                "[4308706598005506049, 4308706598013894655]",
+                "[4308706598013894657, 4308706598148112383]",
+                "[4308706598148112384, 4308706598148112384]",
+                "[4308706598148112385, 4308706598282330111]",
+                "[4308706598282330113, 4308706598416547839]",
+                "[4308706598953418752, 4308706598953418752]",
+                "[4308706599758725120, 4308706599758725120]",
+                "[4308706599758725121, 4308706599892942847]",
+                "[4308706600027160576, 4308706600027160576]",
+                "[4308706604322127872, 4308706604322127872]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308704783255994368, 4308704783255994368]",
+                "[4308704787550961664, 4308704787550961664]",
+                "[4308704788624703488, 4308704788624703488]",
+                "[4308704788624703489, 4308704789161574399]",
+                "[4308704800435863552, 4308704800435863552]",
+                "[4308704811844370433, 4308704811978588159]",
+                "[4308704811978588160, 4308704811978588160]",
+                "[4308704811978588161, 4308704812112805887]",
+                "[4308704812247023616, 4308704812247023616]",
+                "[4308704812414795777, 4308704812448350207]",
+                "[4308704812448350208, 4308704812448350208]",
+                "[4308704812515459072, 4308704812515459072]",
+                "[4308704813320765440, 4308704813320765440]",
+                "[4308704817615732736, 4308704817615732736]",
+                "[4308704869155340288, 4308704869155340288]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706570499260417, 4308706571036131327]",
+                "[4308706571036131328, 4308706571036131328]",
+                "[4308706571036131329, 4308706571573002239]",
+                "[4308706573183614976, 4308706573183614976]",
+                "[4308706573183614977, 4308706573720485887]",
+                "[4308706573720485889, 4308706574257356799]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706574257356801, 4308706574391574527]",
+                "[4308706574525792256, 4308706574525792256]",
+                "[4308706574525792257, 4308706574559346687]",
+                "[4308706574559346689, 4308706574567735295]",
+                "[4308706574576123904, 4308706574576123904]",
+                "[4308706574576123905, 4308706574584512511]",
+                "[4308706574584512513, 4308706574592901119]",
+                "[4308706574592901120, 4308706574592901120]",
+                "[4308706574592901121, 4308706574626455551]",
+                "[4308706574626455553, 4308706574660009983]",
+                "[4308706574660009985, 4308706574794227711]",
+                "[4308706574794227713, 4308706575331098623]",
+                "[4308706575331098624, 4308706575331098624]",
+                "[4308706575331098625, 4308706575867969535]",
+                "[4308706577075929089, 4308706577210146815]",
+                "[4308706577210146816, 4308706577210146816]",
+                "[4308706577210146817, 4308706577344364543]",
+                "[4308706577478582272, 4308706577478582272]",
+                "[4308706577612800001, 4308706577747017727]",
+                "[4308706577747017728, 4308706577747017728]",
+                "[4308706577747017729, 4308706577881235455]",
+                "[4308706577881235457, 4308706578015453183]",
+                "[4308706578552324097, 4308706580699807743]",
+                "[4308706580699807745, 4308706580834025471]",
+                "[4308706580968243200, 4308706580968243200]",
+                "[4308706581773549568, 4308706581773549568]",
+                "[4308706582847291392, 4308706582847291392]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308706591437225984, 4308706591437225984]",
+                "[4308706592510967808, 4308706592510967808]",
+                "[4308706593316274176, 4308706593316274176]",
+                "[4308706593450491905, 4308706593584709631]",
+                "[4308706593584709633, 4308706595732193279]",
+                "[4308706596269064193, 4308706596403281919]",
+                "[4308706596403281921, 4308706596537499647]",
+                "[4308706596537499648, 4308706596537499648]",
+                "[4308706596537499649, 4308706596671717375]",
+                "[4308706596805935104, 4308706596805935104]",
+                "[4308706596940152833, 4308706597074370559]",
+                "[4308706597074370560, 4308706597074370560]",
+                "[4308706597074370561, 4308706597208588287]",
+                "[4308706598416547841, 4308706598953418751]",
+                "[4308706598953418752, 4308706598953418752]",
+                "[4308706598953418753, 4308706599490289663]",
+                "[4308706599490289665, 4308706599624507391]",
+                "[4308706599624507393, 4308706599758725119]",
+                "[4308706599758725120, 4308706599758725120]",
+                "[4308706599892942849, 4308706600027160575]",
+                "[4308706600027160576, 4308706600027160576]",
+                "[4308706600027160577, 4308706600564031487]",
+                "[4308706600564031489, 4308706600597585919]",
+                "[4308706600631140352, 4308706600631140352]",
+                "[4308706600832466944, 4308706600832466944]",
+                "[4308706601100902400, 4308706601100902400]",
+                "[4308706602711515137, 4308706603248386047]",
+                "[4308706603248386048, 4308706603248386048]",
+                "[4308706603248386049, 4308706603785256959]",
+                "[4308706604322127872, 4308706604322127872]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308704778961027072, 4308704778961027072]",
+                "[4308704780034768896, 4308704780034768896]",
+                "[4308704780034768897, 4308704780571639807]",
+                "[4308704783255994368, 4308704783255994368]",
+                "[4308704783255994369, 4308704785403478015]",
+                "[4308704785403478017, 4308704787550961663]",
+                "[4308704787550961664, 4308704787550961664]",
+                "[4308704787550961665, 4308704788087832575]",
+                "[4308704788087832577, 4308704788624703487]",
+                "[4308704788624703488, 4308704788624703488]",
+                "[4308704789161574401, 4308704789698445311]",
+                "[4308704789698445313, 4308704791845928959]",
+                "[4308704800435863552, 4308704800435863552]",
+                "[4308704809025798145, 4308704811173281791]",
+                "[4308704811173281793, 4308704811710152703]",
+                "[4308704811710152705, 4308704811844370431]",
+                "[4308704811978588160, 4308704811978588160]",
+                "[4308704812112805889, 4308704812247023615]",
+                "[4308704812247023616, 4308704812247023616]",
+                "[4308704812247023617, 4308704812381241343]",
+                "[4308704812381241345, 4308704812414795775]",
+                "[4308704812448350208, 4308704812448350208]",
+                "[4308704812448350209, 4308704812481904639]",
+                "[4308704812481904641, 4308704812515459071]",
+                "[4308704812515459072, 4308704812515459072]",
+                "[4308704812515459073, 4308704812649676799]",
+                "[4308704812649676801, 4308704812783894527]",
+                "[4308704812783894529, 4308704813320765439]",
+                "[4308704813320765440, 4308704813320765440]",
+                "[4308704813320765441, 4308704815468249087]",
+                "[4308704815468249089, 4308704817615732735]",
+                "[4308704817615732736, 4308704817615732736]",
+                "[4308704819763216385, 4308704821910700031]",
+                "[4308704821910700032, 4308704821910700032]",
+                "[4308704869155340288, 4308704869155340288]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706557077487616, 4308706557077487616]",
+                "[4308706557077487617, 4308706559224971263]",
+                "[4308706565667422208, 4308706565667422208]",
+                "[4308706565667422209, 4308706567814905855]",
+                "[4308706567814905857, 4308706569962389503]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706569962389505, 4308706570499260415]",
+                "[4308706571036131328, 4308706571036131328]",
+                "[4308706571573002241, 4308706572109873151]",
+                "[4308706572109873153, 4308706572646744063]",
+                "[4308706572646744065, 4308706573183614975]",
+                "[4308706573183614976, 4308706573183614976]",
+                "[4308706574257356800, 4308706574257356800]",
+                "[4308706580834025473, 4308706580968243199]",
+                "[4308706580968243200, 4308706580968243200]",
+                "[4308706580968243201, 4308706581102460927]",
+                "[4308706581102460929, 4308706581236678655]",
+                "[4308706581236678657, 4308706581773549567]",
+                "[4308706581773549568, 4308706581773549568]",
+                "[4308706581773549569, 4308706582310420479]",
+                "[4308706582310420481, 4308706582847291391]",
+                "[4308706582847291392, 4308706582847291392]",
+                "[4308706582847291393, 4308706584994775039]",
+                "[4308706584994775041, 4308706587142258687]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308706587142258689, 4308706589289742335]",
+                "[4308706589289742337, 4308706591437225983]",
+                "[4308706591437225984, 4308706591437225984]",
+                "[4308706591437225985, 4308706591974096895]",
+                "[4308706591974096897, 4308706592510967807]",
+                "[4308706592510967808, 4308706592510967808]",
+                "[4308706592510967809, 4308706593047838719]",
+                "[4308706593047838721, 4308706593182056447]",
+                "[4308706593182056449, 4308706593316274175]",
+                "[4308706593316274176, 4308706593316274176]",
+                "[4308706593316274177, 4308706593450491903]",
+                "[4308706600027160576, 4308706600027160576]",
+                "[4308706600597585921, 4308706600631140351]",
+                "[4308706600631140352, 4308706600631140352]",
+                "[4308706600631140353, 4308706600664694783]",
+                "[4308706600664694785, 4308706600698249215]",
+                "[4308706600698249217, 4308706600832466943]",
+                "[4308706600832466944, 4308706600832466944]",
+                "[4308706600832466945, 4308706600966684671]",
+                "[4308706600966684673, 4308706601100902399]",
+                "[4308706601100902400, 4308706601100902400]",
+                "[4308706601100902401, 4308706601637773311]",
+                "[4308706601637773313, 4308706602174644223]",
+                "[4308706602174644225, 4308706602711515135]",
+                "[4308706603248386048, 4308706603248386048]",
+                "[4308706603785256961, 4308706604322127871]",
+                "[4308706604322127872, 4308706604322127872]",
+                "[4308706604322127873, 4308706606469611519]",
+                "[4308706606469611521, 4308706608617095167]",
+                "[4308706608617095168, 4308706608617095168]",
+                "[4308706615059546113, 4308706617207029759]",
+                "[4308706617207029760, 4308706617207029760]",
+                "[4308706617878118401, 4308706618012336127]",
+                "[4308706618012336128, 4308706618012336128]",
+                "[4308706618280771584, 4308706618280771584]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308700196230922240, 4308700196230922240]",
+                "[4308703494765805568, 4308703494765805568]",
+                "[4308703769643712512, 4308703769643712512]",
+                "[4308703915672600577, 4308703924262535167]",
+                "[4308703924262535168, 4308703924262535168]",
+                "[4308703975802142720, 4308703975802142720]",
+                "[4308704027341750272, 4308704027341750272]",
+                "[4308704027341750273, 4308704035931684863]",
+                "[4308704035931684865, 4308704044521619455]",
+                "[4308704044521619457, 4308704053111554047]",
+                "[4308704061701488640, 4308704061701488640]",
+                "[4308704074586390528, 4308704074586390528]",
+                "[4308704075660132352, 4308704075660132352]",
+                "[4308704075928567808, 4308704075928567808]",
+                "[4308704075928567809, 4308704076062785535]",
+                "[4308704113241096192, 4308704113241096192]",
+                "[4308704319399526400, 4308704319399526400]",
+                "[4308704748896256000, 4308704748896256000]",
+                "[4308704753191223296, 4308704753191223296]",
+                "[4308704754264965120, 4308704754264965120]",
+                "[4308704754264965121, 4308704754801836031]",
+                "[4308704766076125185, 4308704774666059775]",
+                "[4308704774666059777, 4308704776813543423]",
+                "[4308704776813543425, 4308704778961027071]",
+                "[4308704778961027072, 4308704778961027072]",
+                "[4308704778961027073, 4308704779497897983]",
+                "[4308704779497897985, 4308704780034768895]",
+                "[4308704780034768896, 4308704780034768896]",
+                "[4308704780571639809, 4308704781108510719]",
+                "[4308704781108510721, 4308704783255994367]",
+                "[4308704783255994368, 4308704783255994368]",
+                "[4308704791845928961, 4308704800435863551]",
+                "[4308704800435863552, 4308704800435863552]",
+                "[4308704800435863553, 4308704809025798143]",
+                "[4308704817615732736, 4308704817615732736]",
+                "[4308704817615732737, 4308704819763216383]",
+                "[4308704821910700032, 4308704821910700032]",
+                "[4308704821910700033, 4308704824058183679]",
+                "[4308704824058183681, 4308704826205667327]",
+                "[4308704826205667329, 4308704834795601919]",
+                "[4308704843385536513, 4308704851975471103]",
+                "[4308704851975471104, 4308704851975471104]",
+                "[4308704869155340288, 4308704869155340288]",
+                "[4308704907810045952, 4308704907810045952]",
+                "[4308704909957529601, 4308704912105013247]",
+                "[4308704912105013249, 4308704920694947839]",
+                "[4308704920694947840, 4308704920694947840]",
+                "[4308704937874817024, 4308704937874817024]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706449703305216, 4308706449703305216]",
+                "[4308706466883174400, 4308706466883174400]",
+                "[4308706466883174401, 4308706475473108991]",
+                "[4308706475473108993, 4308706484063043583]",
+                "[4308706484063043585, 4308706486210527231]",
+                "[4308706488358010880, 4308706488358010880]",
+                "[4308706501242912768, 4308706501242912768]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706518422781953, 4308706552782520319]",
+                "[4308706552782520321, 4308706554930003967]",
+                "[4308706554930003969, 4308706557077487615]",
+                "[4308706557077487616, 4308706557077487616]",
+                "[4308706559224971265, 4308706561372454911]",
+                "[4308706561372454913, 4308706563519938559]",
+                "[4308706563519938561, 4308706565667422207]",
+                "[4308706565667422208, 4308706565667422208]",
+                "[4308706569962389504, 4308706569962389504]",
+                "[4308706587142258688, 4308706587142258688]",
+                "[4308706604322127872, 4308706604322127872]",
+                "[4308706608617095168, 4308706608617095168]",
+                "[4308706608617095169, 4308706610764578815]",
+                "[4308706610764578817, 4308706612912062463]",
+                "[4308706612912062465, 4308706615059546111]",
+                "[4308706617207029760, 4308706617207029760]",
+                "[4308706617207029761, 4308706617743900671]",
+                "[4308706617743900673, 4308706617878118399]",
+                "[4308706618012336128, 4308706618012336128]",
+                "[4308706618012336129, 4308706618146553855]",
+                "[4308706618146553857, 4308706618280771583]",
+                "[4308706618280771584, 4308706618280771584]",
+                "[4308706618280771585, 4308706618817642495]",
+                "[4308706618817642497, 4308706619354513407]",
+                "[4308706619354513409, 4308706621501997055]",
+                "[4308706621501997057, 4308706655861735423]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        },
+        {
+          "stage": "FETCH",
+          "inputStage": {
+            "stage": "IXSCAN",
+            "keyPattern": {
+              "location": "2dsphere",
+              "created_at": -1
+            },
+            "indexName": "idx_sessions_geo_recent",
+            "isMultiKey": false,
+            "multiKeyPaths": {
+              "location": [],
+              "created_at": []
+            },
+            "isUnique": false,
+            "isSparse": false,
+            "isPartial": false,
+            "indexVersion": 2,
+            "direction": "forward",
+            "indexBounds": {
+              "location": [
+                "[4251398048237748224, 4251398048237748224]",
+                "[4305441243766194176, 4305441243766194176]",
+                "[4308537468510011392, 4308537468510011392]",
+                "[4308695798184411136, 4308695798184411136]",
+                "[4308700196230922240, 4308700196230922240]",
+                "[4308703494765805568, 4308703494765805568]",
+                "[4308703769643712512, 4308703769643712512]",
+                "[4308703778233647105, 4308703786823581695]",
+                "[4308703786823581696, 4308703786823581696]",
+                "[4308703838363189248, 4308703838363189248]",
+                "[4308703872722927617, 4308703907082665983]",
+                "[4308703907082665985, 4308703915672600575]",
+                "[4308703924262535168, 4308703924262535168]",
+                "[4308703924262535169, 4308703932852469759]",
+                "[4308703932852469761, 4308703941442404351]",
+                "[4308703941442404353, 4308703975802142719]",
+                "[4308703975802142720, 4308703975802142720]",
+                "[4308703975802142721, 4308704010161881087]",
+                "[4308704010161881089, 4308704018751815679]",
+                "[4308704018751815681, 4308704027341750271]",
+                "[4308704027341750272, 4308704027341750272]",
+                "[4308704053111554049, 4308704061701488639]",
+                "[4308704061701488640, 4308704061701488640]",
+                "[4308704061701488641, 4308704070291423231]",
+                "[4308704070291423233, 4308704072438906879]",
+                "[4308704072438906881, 4308704074586390527]",
+                "[4308704074586390528, 4308704074586390528]",
+                "[4308704074586390529, 4308704075123261439]",
+                "[4308704075123261441, 4308704075660132351]",
+                "[4308704075660132352, 4308704075660132352]",
+                "[4308704075660132353, 4308704075794350079]",
+                "[4308704075794350081, 4308704075928567807]",
+                "[4308704075928567808, 4308704075928567808]",
+                "[4308704076062785537, 4308704076197003263]",
+                "[4308704076197003265, 4308704076733874175]",
+                "[4308704076733874177, 4308704078881357823]",
+                "[4308704078881357825, 4308704113241096191]",
+                "[4308704113241096192, 4308704113241096192]",
+                "[4308704113241096193, 4308704147600834559]",
+                "[4308704147600834561, 4308704181960572927]",
+                "[4308704319399526400, 4308704319399526400]",
+                "[4308704525557956608, 4308704525557956608]",
+                "[4308704542737825792, 4308704542737825792]",
+                "[4308704547032793088, 4308704547032793088]",
+                "[4308704547032793089, 4308704549180276735]",
+                "[4308704662996910080, 4308704662996910080]",
+                "[4308704662996910081, 4308704697356648447]",
+                "[4308704697356648449, 4308704731716386815]",
+                "[4308704731716386817, 4308704740306321407]",
+                "[4308704740306321409, 4308704748896255999]",
+                "[4308704748896256000, 4308704748896256000]",
+                "[4308704748896256001, 4308704751043739647]",
+                "[4308704751043739649, 4308704753191223295]",
+                "[4308704753191223296, 4308704753191223296]",
+                "[4308704753191223297, 4308704753728094207]",
+                "[4308704753728094209, 4308704754264965119]",
+                "[4308704754264965120, 4308704754264965120]",
+                "[4308704754801836033, 4308704755338706943]",
+                "[4308704755338706945, 4308704757486190591]",
+                "[4308704757486190593, 4308704766076125183]",
+                "[4308704800435863552, 4308704800435863552]",
+                "[4308704834795601921, 4308704843385536511]",
+                "[4308704851975471104, 4308704851975471104]",
+                "[4308704851975471105, 4308704860565405695]",
+                "[4308704860565405697, 4308704869155340287]",
+                "[4308704869155340288, 4308704869155340288]",
+                "[4308704869155340289, 4308704903515078655]",
+                "[4308704903515078657, 4308704905662562303]",
+                "[4308704905662562305, 4308704907810045951]",
+                "[4308704907810045952, 4308704907810045952]",
+                "[4308704907810045953, 4308704909957529599]",
+                "[4308704920694947840, 4308704920694947840]",
+                "[4308704920694947841, 4308704929284882431]",
+                "[4308704929284882433, 4308704937874817023]",
+                "[4308704937874817024, 4308704937874817024]",
+                "[4308704937874817025, 4308704972234555391]",
+                "[4308704972234555393, 4308705006594293759]",
+                "[4308705040954032129, 4308705075313770495]",
+                "[4308705075313770496, 4308705075313770496]",
+                "[4308705693789061120, 4308705693789061120]",
+                "[4308706312264351744, 4308706312264351744]",
+                "[4308706312264351745, 4308706346624090111]",
+                "[4308706346624090113, 4308706346758307839]",
+                "[4308706346892525568, 4308706346892525568]",
+                "[4308706347697831936, 4308706347697831936]",
+                "[4308706350919057408, 4308706350919057408]",
+                "[4308706363803959296, 4308706363803959296]",
+                "[4308706380983828481, 4308706415343566847]",
+                "[4308706415343566849, 4308706449703305215]",
+                "[4308706449703305216, 4308706449703305216]",
+                "[4308706449703305217, 4308706458293239807]",
+                "[4308706458293239809, 4308706466883174399]",
+                "[4308706466883174400, 4308706466883174400]",
+                "[4308706486210527233, 4308706488358010879]",
+                "[4308706488358010880, 4308706488358010880]",
+                "[4308706488358010881, 4308706490505494527]",
+                "[4308706490505494529, 4308706492652978175]",
+                "[4308706492652978177, 4308706501242912767]",
+                "[4308706501242912768, 4308706501242912768]",
+                "[4308706501242912769, 4308706509832847359]",
+                "[4308706509832847361, 4308706518422781951]",
+                "[4308706518422781952, 4308706518422781952]",
+                "[4308706655861735425, 4308706690221473791]",
+                "[4308706690221473793, 4308706724581212159]",
+                "[4308706724581212160, 4308706724581212160]",
+                "[4308708992323944448, 4308708992323944448]",
+                "[4308748574742544384, 4308748574742544384]",
+                "[4308818943486722048, 4308818943486722048]",
+                "[4309944843393564672, 4309944843393564672]"
+              ],
+              "created_at": [
+                "[new Date(9223372036854775807), new Date(1791356226196)]"
+              ]
+            }
+          }
+        }
+      ]
     }
   },
-  {
-    "workflow_4_facet_stats": {
-      "explainVersion": "1",
-      "stages": [
-        {
-          "$cursor": {
-            "queryPlanner": {
-              "namespace": "stayspot.PropertyReviews",
-              "parsedQuery": {},
-              "indexFilterSet": false,
-              "queryHash": "C0BD3948",
-              "planCacheShapeHash": "C0BD3948",
-              "planCacheKey": "BCA05D32",
-              "optimizationTimeMillis": 0,
-              "cursorType": "regular",
-              "maxIndexedOrSolutionsReached": false,
-              "maxIndexedAndSolutionsReached": false,
-              "maxScansToExplodeReached": false,
-              "prunedSimilarIndexes": false,
-              "winningPlan": {
-                "isCached": false,
-                "stage": "PROJECTION_SIMPLE",
-                "transformBy": {
-                  "location_tags": 1,
-                  "rating": 1,
-                  "_id": 0
-                },
-                "inputStage": {
-                  "stage": "COLLSCAN",
-                  "nss": "stayspot.PropertyReviews",
-                  "direction": "forward"
-                }
-              },
-              "rejectedPlans": []
-            },
-            "executionStats": {
-              "executionSuccess": true,
-              "nReturned": 50000,
-              "executionTimeMillis": 659,
-              "totalKeysExamined": 0,
-              "totalDocsExamined": 50000,
-              "executionStages": {
-                "isCached": false,
-                "stage": "PROJECTION_SIMPLE",
-                "nReturned": 50000,
-                "executionTimeMillisEstimate": 81,
-                "works": 50001,
-                "advanced": 50000,
-                "needTime": 0,
-                "needYield": 0,
-                "saveState": 17,
-                "restoreState": 16,
-                "isEOF": 1,
-                "transformBy": {
-                  "location_tags": 1,
-                  "rating": 1,
-                  "_id": 0
-                },
-                "inputStage": {
-                  "stage": "COLLSCAN",
-                  "nReturned": 50000,
-                  "executionTimeMillisEstimate": 74,
-                  "works": 50001,
-                  "advanced": 50000,
-                  "needTime": 0,
-                  "needYield": 0,
-                  "saveState": 17,
-                  "restoreState": 16,
-                  "isEOF": 1,
-                  "nss": "stayspot.PropertyReviews",
-                  "direction": "forward",
-                  "docsExamined": 50000
-                }
-              }
-            }
-          },
-          "nReturned": 50000,
-          "executionTimeMillisEstimate": 192
-        },
-        {
-          "$facet": {
-            "ratingDistributions": [
-              {
-                "$internalFacetTeeConsumer": {},
-                "nReturned": 50000,
-                "executionTimeMillisEstimate": 192
-              },
-              {
-                "$group": {
-                  "_id": "$rating",
-                  "count": {
-                    "$sum": {
-                      "$const": 1
-                    }
-                  },
-                  "$willBeMerged": false
-                },
-                "nReturned": 41,
-                "executionTimeMillisEstimate": 242,
-                "maxAccumulatorMemoryUsageBytes": {
-                  "count": 9184
-                },
-                "totalOutputDataSizeBytes": 9717,
-                "usedDisk": false,
-                "spills": 0,
-                "spilledDataStorageSize": 0,
-                "spilledBytes": 0,
-                "spilledRecords": 0,
-                "peakTrackedMemBytes": 9840
-              },
-              {
-                "$sort": {
-                  "sortKey": {
-                    "_id": -1
-                  }
-                },
-                "totalDataSizeSortedBytesEstimate": 10045,
-                "usedDisk": false,
-                "spills": 0,
-                "spilledBytes": 0,
-                "spilledRecords": 0,
-                "spilledDataStorageSize": 0,
-                "nReturned": 41,
-                "executionTimeMillisEstimate": 242,
-                "peakTrackedMemBytes": 10045
-              }
-            ],
-            "frequentTags": [
-              {
-                "$internalFacetTeeConsumer": {},
-                "nReturned": 50000,
-                "executionTimeMillisEstimate": 0
-              },
-              {
-                "$unwind": {
-                  "path": "$location_tags"
-                },
-                "nReturned": 100132,
-                "executionTimeMillisEstimate": 123
-              },
-              {
-                "$group": {
-                  "_id": "$location_tags",
-                  "count": {
-                    "$sum": {
-                      "$const": 1
-                    }
-                  },
-                  "$willBeMerged": false
-                },
-                "nReturned": 5,
-                "executionTimeMillisEstimate": 250,
-                "maxAccumulatorMemoryUsageBytes": {
-                  "count": 1120
-                },
-                "totalOutputDataSizeBytes": 1227,
-                "usedDisk": false,
-                "spills": 0,
-                "spilledDataStorageSize": 0,
-                "spilledBytes": 0,
-                "spilledRecords": 0,
-                "peakTrackedMemBytes": 1242
-              },
-              {
-                "$sort": {
-                  "sortKey": {
-                    "count": -1
-                  },
-                  "limit": 10
-                },
-                "totalDataSizeSortedBytesEstimate": 1267,
-                "usedDisk": false,
-                "spills": 0,
-                "spilledBytes": 0,
-                "spilledRecords": 0,
-                "spilledDataStorageSize": 0,
-                "nReturned": 5,
-                "executionTimeMillisEstimate": 250,
-                "peakTrackedMemBytes": 1267
-              }
-            ],
-            "overallAverage": [
-              {
-                "$internalFacetTeeConsumer": {},
-                "nReturned": 50000,
-                "executionTimeMillisEstimate": 109
-              },
-              {
-                "$group": {
-                  "_id": {
-                    "$const": null
-                  },
-                  "averageRating": {
-                    "$avg": "$rating"
-                  },
-                  "$willBeMerged": false
-                },
-                "nReturned": 1,
-                "executionTimeMillisEstimate": 159,
-                "maxAccumulatorMemoryUsageBytes": {
-                  "averageRating": 192
-                },
-                "totalOutputDataSizeBytes": 237,
-                "usedDisk": false,
-                "spills": 0,
-                "spilledDataStorageSize": 0,
-                "spilledBytes": 0,
-                "spilledRecords": 0,
-                "peakTrackedMemBytes": 208
-              },
-              {
-                "$project": {
-                  "averageRating": {
-                    "$round": [
-                      "$averageRating",
-                      {
-                        "$const": 2
-                      }
-                    ]
-                  },
-                  "_id": false
-                },
-                "nReturned": 1,
-                "executionTimeMillisEstimate": 159
-              }
-            ]
-          },
-          "nReturned": 1,
-          "executionTimeMillisEstimate": 651
-        }
-      ],
-      "queryShapeHash": "2974FF1A3A90EEBD049D2FE6B09E07AF074941644F7C3ABE0EA08A6035481DDE",
-      "serverInfo": {
-        "host": "Anujs-MacBook-Air.local",
-        "port": 27017,
-        "version": "8.3.7",
-        "gitVersion": "34eee04f34989abb7a3d91447976f033f4f74af2"
-      },
-      "serverParameters": {
-        "internalQueryFacetBufferSizeBytes": 104857600,
-        "internalDocumentSourceGroupMaxMemoryBytes": 104857600,
-        "internalQueryMaxBlockingSortMemoryUsageBytes": 104857600,
-        "internalDocumentSourceSetWindowFieldsMaxMemoryBytes": 104857600,
-        "internalQueryFacetMaxOutputDocSizeBytes": 104857600,
-        "internalLookupStageIntermediateDocumentMaxSizeBytes": 104857600,
-        "internalQueryProhibitBlockingMergeOnMongoS": 0,
-        "internalQueryMaxAddToSetBytes": 104857600,
-        "internalQueryFrameworkControl": "trySbeRestricted",
-        "internalQueryPlannerIgnoreIndexWithCollationForRegex": 1
-      },
-      "command": {
-        "aggregate": "PropertyReviews",
-        "pipeline": [
-          {
-            "$facet": {
-              "ratingDistributions": [
-                {
-                  "$group": {
-                    "_id": "$rating",
-                    "count": {
-                      "$sum": 1
-                    }
-                  }
-                },
-                {
-                  "$sort": {
-                    "_id": -1
-                  }
-                }
-              ],
-              "frequentTags": [
-                {
-                  "$unwind": "$location_tags"
-                },
-                {
-                  "$group": {
-                    "_id": "$location_tags",
-                    "count": {
-                      "$sum": 1
-                    }
-                  }
-                },
-                {
-                  "$sort": {
-                    "count": -1
-                  }
-                },
-                {
-                  "$limit": 10
-                }
-              ],
-              "overallAverage": [
-                {
-                  "$group": {
-                    "_id": null,
-                    "averageRating": {
-                      "$avg": "$rating"
-                    }
-                  }
-                },
-                {
-                  "$project": {
-                    "_id": 0,
-                    "averageRating": {
-                      "$round": [
-                        "$averageRating",
-                        2
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        ],
-        "cursor": {},
-        "$db": "stayspot"
-      },
-      "ok": 1
-    }
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 224,
+    "executionTimeMillis": 6,
+    "totalKeysExamined": 4866,
+    "totalDocsExamined": 1146
   }
-]
+}
+```
+
+Workflow 4 cursor excerpt from explain("executionStats"):
+
+```json
+{
+  "queryPlanner": {
+    "winningPlan": {
+      "isCached": false,
+      "stage": "PROJECTION_SIMPLE",
+      "transformBy": {
+        "rating": true,
+        "location_tags": true,
+        "_id": false
+      },
+      "inputStage": {
+        "stage": "FETCH",
+        "inputStage": {
+          "stage": "IXSCAN",
+          "keyPattern": {
+            "property_id": 1,
+            "timestamp": -1
+          },
+          "indexName": "idx_reviews_property_time",
+          "isMultiKey": false,
+          "multiKeyPaths": {
+            "property_id": [],
+            "timestamp": []
+          },
+          "isUnique": false,
+          "isSparse": false,
+          "isPartial": false,
+          "indexVersion": 2,
+          "direction": "forward",
+          "indexBounds": {
+            "property_id": [
+              "[1, 1]"
+            ],
+            "timestamp": [
+              "[new Date(9223372036854775807), new Date(1759823826196)]"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 28,
+    "executionTimeMillis": 0,
+    "totalKeysExamined": 28,
+    "totalDocsExamined": 28
+  }
+}
+```
+
+Full [SQL plans](performance/postgres_explain_analyzes.txt), [MongoDB executionStats](performance/mongo_execution_stats.json), and [before/after complexity report](docs/performance_and_complexity.md).

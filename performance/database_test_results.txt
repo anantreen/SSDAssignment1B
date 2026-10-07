@@ -1,0 +1,13 @@
+test_audit_is_immutable (__main__.DatabaseChecks.test_audit_is_immutable) ... ok
+test_booking_debit_and_trigger_are_atomic (__main__.DatabaseChecks.test_booking_debit_and_trigger_are_atomic) ... ok
+test_insufficient_wallet_rolls_back (__main__.DatabaseChecks.test_insufficient_wallet_rolls_back) ... ok
+test_materialized_nights_are_exact (__main__.DatabaseChecks.test_materialized_nights_are_exact) ... ok
+test_mongo_seed_indexes_and_cross_database_ids (__main__.DatabaseChecks.test_mongo_seed_indexes_and_cross_database_ids) ... ok
+test_negative_null_wallet_and_bad_nights_are_rejected (__main__.DatabaseChecks.test_negative_null_wallet_and_bad_nights_are_rejected) ... ok
+test_performance_reports_show_real_index_paths (__main__.DatabaseChecks.test_performance_reports_show_real_index_paths) ... ok
+test_required_row_counts (__main__.DatabaseChecks.test_required_row_counts) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.265s
+
+OK

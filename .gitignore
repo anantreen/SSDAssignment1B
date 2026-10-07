@@ -219,3 +219,22 @@ __marimo__/
 
 # macos folder metadata file
 .DS_Store
+
+# StaySpot local development and submission exclusions
+.env
+node_modules/
+dist/
+.runtime/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.zip
+
+# Keep local environment variants private while retaining the sample configuration.
+.env.*
+!.env.example
+
+# React source helpers are application code, not Python virtual-environment libraries.
+!members/member1/web/lib/
+!members/member1/web/lib/*.js

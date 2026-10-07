@@ -1,3 +1,3 @@
-CREATE UNIQUE INDEX idx_active_stay 
-ON bookings (guest_id) 
-WHERE status = 'CHECKED_IN';
+-- Stable setup/workflow entry point. Member 2 owns the documented source below.
+-- psql \ir resolves the include relative to this file, independent of shell cwd.
+\ir ../members/member2/sql/02_indexes.sql

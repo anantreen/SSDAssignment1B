@@ -1,0 +1,13 @@
+
+> stayspot-assignment-2@1.0.0 build
+> vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 1599 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/index.html                   0.43 kB │ gzip:   0.31 kB
+../dist/assets/index-B931S5Rr.css   40.39 kB │ gzip:  12.63 kB
+../dist/assets/index-zFskhXiZ.js   415.48 kB │ gzip: 126.49 kB
+✓ built in 2.12s

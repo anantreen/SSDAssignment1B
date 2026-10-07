@@ -1,0 +1,24 @@
+
+> stayspot-assignment-2@1.0.0 test
+> node --env-file-if-exists=.env --test tests/*.test.js
+
+✔ keyset browsing returns bounded non-overlapping pages and detail records (54.810625ms)
+✔ booking commits one debit, one booking and one trigger-created audit (16.775625ms)
+✔ insufficient funds leaves wallet, bookings and audits unchanged (3.005125ms)
+✔ second active check-in rolls back its debit and audit; completion releases slot (8.093041ms)
+✔ concurrent bookings cannot spend the same wallet money twice (7.4925ms)
+✔ audit records reject update, delete and truncate (8.497208ms)
+✔ malformed inputs and forged prices cannot alter a booking (9.433875ms)
+✔ audit microsecond cursor does not repeat or skip adjacent entries (5.081917ms)
+✔ moving averages include missing days and full seven-day warm-up; ranks compare properties (2.33225ms)
+✔ refresh updates the real materialized timestamp and total nights (41.83775ms)
+✔ geoNear stays inside five kilometres; new pins appear in subsequent reads (33.280958ms)
+✔ facet returns five star buckets matching average counts and a flexible catalog (10.489666ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 414.987542

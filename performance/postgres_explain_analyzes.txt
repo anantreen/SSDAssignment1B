@@ -1,83 +1,312 @@
-EXPLAIN ANALYZE of Materialized view queries.
-EXPLAIN ANALYZE SELECT * FROM mv_property_summary WHERE property_id = 1;
+PostgreSQL 16.15 (Homebrew) on aarch64-apple-darwin25.6.0, compiled by Apple clang version 21.0.0 (clang-2100.1.1.101), 64-bit
+Planner defaults unchanged; no enable_seqscan override.
 
- Index Scan using idx_mv_property_summary_id on mv_property_summary (cost=0.28..8.29 rows=1 width=33) 
- (actual time=0.040..0.042 rows=1.00 loops=1)
- Index Cond: (property_id = 1)
- Index Searches: 1
- Buffers: shared hit=3
- Planning:
- Buffers: shared hit=61
- Planning Time: 1.473 ms
- Execution Time: 0.739 ms
+legacy_all_history
+WITH DateRange AS (
+    SELECT generate_series(
+        (SELECT MIN(DATE(created_at)) FROM bookings),
+        (SELECT MAX(DATE(created_at)) FROM bookings),
+        '1 day'::interval
+    )::date AS calendar_date
+),
 
- --------------------------------------------------------------------------------------------------------
+-- CTE 2: CROSS JOIN properties with dates so EVERY property has EVERY date
+PropertyDates AS (
+    SELECT p.id AS property_id, d.calendar_date
+    FROM properties p
+    CROSS JOIN DateRange d
+),
 
-  Incremental Sort  (cost=9574.41..265942.02 rows=400200 width=112) (actual time=80.315..1067.743 rows=732366.00 loops=1)
-   Sort Key: movingaverages.property_id, movingaverages.booking_date DESC
-   Presorted Key: movingaverages.property_id
-   Full-sort Groups: 2001  Sort Method: quicksort  Average Memory: 28kB  Peak Memory: 28kB
-   Pre-sorted Groups: 2001  Sort Method: quicksort  Average Memory: 44kB  Peak Memory: 44kB
-   Buffers: shared hit=1262
-   ->  WindowAgg  (cost=8311.29..238991.54 rows=400200 width=112) (actual time=79.420..960.839 rows=732366.00 loops=1)
-         Window: w1 AS (PARTITION BY movingaverages.property_id ORDER BY movingaverages.moving_avg_7d ROWS UNBOUNDED PRECEDING)
-         Storage: Memory  Maximum Storage: 17kB
-         Buffers: shared hit=1262
-         ->  Incremental Sort  (cost=8310.72..230987.54 rows=400200 width=72) (actual time=79.409..769.808 rows=732366.00 loops=1)
-               Sort Key: movingaverages.property_id, movingaverages.moving_avg_7d DESC
-               Presorted Key: movingaverages.property_id
-               Full-sort Groups: 2001  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
-               Pre-sorted Groups: 2001  Sort Method: quicksort  Average Memory: 38kB  Peak Memory: 38kB
-               Buffers: shared hit=1262
-               ->  Subquery Scan on movingaverages  (cost=7216.90..204037.06 rows=400200 width=72) (actual time=78.912..649.594 rows=732366.00 loops=1)
-                     Buffers: shared hit=1259
-                     ->  WindowAgg  (cost=7216.90..204037.06 rows=400200 width=72) (actual time=78.911..617.217 rows=732366.00 loops=1)
-                           Window: w1 AS (PARTITION BY p.id ORDER BY (((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date) ROWS BETWEEN '6'::bigint PRECEDING AND CURRENT ROW)
-                           Storage: Memory  Maximum Storage: 17kB
-                           Buffers: shared hit=1259
-                           ->  GroupAggregate  (cost=7216.41..197033.56 rows=400200 width=40) (actual time=78.900..338.943 rows=732366.00 loops=1)
-                                 Group Key: p.id, (((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date)
-                                 Buffers: shared hit=1259
-                                 ->  Merge Left Join  (cost=7216.41..177023.56 rows=2001000 width=14) (actual time=78.876..235.567 rows=734027.00 loops=1)
-                                       Merge Cond: ((p.id = b.property_id) AND ((((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date) = (date(b.created_at))))
-                                       Buffers: shared hit=1259
-                                       ->  Incremental Sort  (cost=2396.70..152196.56 rows=2001000 width=8) (actual time=44.008..139.834 rows=732366.00 loops=1)
-                                             Sort Key: p.id, (((generate_series(((InitPlan 1).col1)::timestamp with time zone, ((InitPlan 2).col1)::timestamp with time zone, '1 day'::interval)))::date)
-                                             Presorted Key: p.id
-                                             Full-sort Groups: 2001  Sort Method: quicksort  Average Memory: 26kB  Peak Memory: 26kB
-                                             Pre-sorted Groups: 2001  Sort Method: quicksort  Average Memory: 33kB  Peak Memory: 33kB
-                                             Buffers: shared hit=842
-                                             ->  Nested Loop  (cost=2334.33..27436.37 rows=2001000 width=8) (actual time=43.640..92.088 rows=732366.00 loops=1)
-                                                   Buffers: shared hit=842
-                                                   ->  Index Only Scan using properties_pkey on properties p  (cost=0.28..62.29 rows=2001 width=4) (actual time=0.023..0.294 rows=2001.00 loops=1)
-                                                         Heap Fetches: 0
-                                                         Index Searches: 1
-                                                         Buffers: shared hit=8
-                                                   ->  Materialize  (cost=2334.05..2364.07 rows=1000 width=4) (actual time=0.022..0.030 rows=366.00 loops=2001)
-                                                         Storage: Memory  Maximum Storage: 28kB
-                                                         Buffers: shared hit=834
-                                                         ->  Result  (cost=2334.05..2359.07 rows=1000 width=4) (actual time=43.601..43.767 rows=366.00 loops=1)
-                                                               Buffers: shared hit=834
-                                                               InitPlan 1
-                                                                 ->  Aggregate  (cost=1167.02..1167.03 rows=1 width=4) (actual time=26.890..26.891 rows=1.00 loops=1)
-                                                                       Buffers: shared hit=417
-                                                                       ->  Seq Scan on bookings  (cost=0.00..917.01 rows=50001 width=8) (actual time=0.028..10.223 rows=50002.00 loops=1)
-                                                                             Buffers: shared hit=417
-                                                               InitPlan 2
-                                                                 ->  Aggregate  (cost=1167.02..1167.03 rows=1 width=4) (actual time=16.277..16.277 rows=1.00 loops=1)
-                                                                       Buffers: shared hit=417
-                                                                       ->  Seq Scan on bookings bookings_1  (cost=0.00..917.01 rows=50001 width=8) (actual time=0.026..3.624 rows=50002.00 loops=1)
-                                                                             Buffers: shared hit=417
-                                                               ->  ProjectSet  (cost=0.00..5.02 rows=1000 width=8) (actual time=43.599..43.691 rows=366.00 loops=1)
-                                                                     Buffers: shared hit=834
-                                                                     ->  Result  (cost=0.00..0.01 rows=1 width=0) (actual time=0.001..0.001 rows=1.00 loops=1)
-                                       ->  Sort  (cost=4819.51..4944.51 rows=50001 width=18) (actual time=34.864..36.203 rows=50002.00 loops=1)
-                                             Sort Key: b.property_id, (date(b.created_at))
-                                             Sort Method: quicksort  Memory: 3710kB
-                                             Buffers: shared hit=417
-                                             ->  Seq Scan on bookings b  (cost=0.00..917.01 rows=50001 width=18) (actual time=0.007..12.479 rows=50002.00 loops=1)
-                                                   Buffers: shared hit=417
- Planning:
- Buffers: shared hit=177
- Planning Time: 6.707 ms
- Execution Time: 1090.849 ms
+-- CTE 3: LEFT JOIN bookings to fill in revenue, using COALESCE to force $0 on empty days
+DailyRevenue AS (
+    SELECT
+        pd.property_id,
+        pd.calendar_date AS booking_date,
+        COALESCE(SUM(b.total_cost), 0) AS daily_total
+    FROM PropertyDates pd
+    LEFT JOIN bookings b
+        ON pd.property_id = b.property_id
+        AND pd.calendar_date = DATE(b.created_at)
+    GROUP BY pd.property_id, pd.calendar_date
+),
+
+-- CTE 4: The 7-Day Window. (Because every date exists now, ROWS is perfectly safe to use)
+MovingAverages AS (
+    SELECT
+        property_id,
+        booking_date,
+        daily_total,
+        AVG(daily_total) OVER (
+            PARTITION BY property_id
+            ORDER BY booking_date
+            ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+        ) AS moving_avg_7d
+    FROM DailyRevenue
+)
+
+-- Final Output: Rank the highest momentum weeks per property
+SELECT
+    property_id,
+    booking_date,
+    daily_total,
+    ROUND(moving_avg_7d, 2) AS moving_avg_7d,
+    DENSE_RANK() OVER (PARTITION BY property_id ORDER BY moving_avg_7d DESC) AS revenue_momentum_rank
+FROM MovingAverages
+ORDER BY property_id, booking_date DESC;
+Incremental Sort  (cost=297315.06..410274.05 rows=400000 width=112) (actual time=148.641..1188.108 rows=732000 loops=1)
+  Output: movingaverages.property_id, movingaverages.booking_date, movingaverages.daily_total, (round(movingaverages.moving_avg_7d, 2)), (dense_rank() OVER (?)), movingaverages.moving_avg_7d
+  Sort Key: movingaverages.property_id, movingaverages.booking_date DESC
+  Presorted Key: movingaverages.property_id
+  Full-sort Groups: 2000  Sort Method: quicksort  Average Memory: 28kB  Peak Memory: 28kB
+  Pre-sorted Groups: 2000  Sort Method: quicksort  Average Memory: 45kB  Peak Memory: 45kB
+  Buffers: shared hit=1416, temp read=1617 written=1627
+  ->  WindowAgg  (cost=296772.57..383338.48 rows=400000 width=112) (actual time=148.125..1065.425 rows=732000 loops=1)
+        Output: movingaverages.property_id, movingaverages.booking_date, movingaverages.daily_total, round(movingaverages.moving_avg_7d, 2), dense_rank() OVER (?), movingaverages.moving_avg_7d
+        Buffers: shared hit=1416, temp read=1617 written=1627
+        ->  Incremental Sort  (cost=296772.57..375338.48 rows=400000 width=72) (actual time=148.122..858.692 rows=732000 loops=1)
+              Output: movingaverages.property_id, movingaverages.moving_avg_7d, movingaverages.booking_date, movingaverages.daily_total
+              Sort Key: movingaverages.property_id, movingaverages.moving_avg_7d DESC
+              Presorted Key: movingaverages.property_id
+              Full-sort Groups: 2000  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
+              Pre-sorted Groups: 2000  Sort Method: quicksort  Average Memory: 40kB  Peak Memory: 40kB
+              Buffers: shared hit=1416, temp read=1617 written=1627
+              ->  Subquery Scan on movingaverages  (cost=296402.92..348402.92 rows=400000 width=72) (actual time=147.771..728.012 rows=732000 loops=1)
+                    Output: movingaverages.property_id, movingaverages.moving_avg_7d, movingaverages.booking_date, movingaverages.daily_total
+                    Buffers: shared hit=1416, temp read=1617 written=1627
+                    ->  WindowAgg  (cost=296402.92..348402.92 rows=400000 width=72) (actual time=147.770..693.665 rows=732000 loops=1)
+                          Output: p.id, (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date), (COALESCE(sum(b.total_cost), '0'::numeric)), avg((COALESCE(sum(b.total_cost), '0'::numeric))) OVER (?)
+                          Buffers: shared hit=1416, temp read=1617 written=1627
+                          ->  GroupAggregate  (cost=296402.92..341402.92 rows=400000 width=40) (actual time=147.758..369.199 rows=732000 loops=1)
+                                Output: p.id, (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date), COALESCE(sum(b.total_cost), '0'::numeric)
+                                Group Key: p.id, (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date)
+                                Buffers: shared hit=1416, temp read=1617 written=1627
+                                ->  Merge Left Join  (cost=296402.92..321402.92 rows=2000000 width=14) (actual time=147.752..251.425 rows=733691 loops=1)
+                                      Output: p.id, (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date), b.total_cost
+                                      Merge Cond: ((p.id = b.property_id) AND ((((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date) = (date(b.created_at))))
+                                      Buffers: shared hit=1416, temp read=1617 written=1627
+                                      ->  Sort  (cost=291532.51..296532.51 rows=2000000 width=8) (actual time=127.421..163.746 rows=732000 loops=1)
+                                            Output: p.id, (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date)
+                                            Sort Key: p.id, (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date)
+                                            Sort Method: external merge  Disk: 12936kB
+                                            Buffers: shared hit=948, temp read=1617 written=1627
+                                            ->  Nested Loop  (cost=2436.30..27525.82 rows=2000000 width=8) (actual time=21.366..70.801 rows=732000 loops=1)
+                                                  Output: p.id, (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date)
+                                                  Buffers: shared hit=948
+                                                  ->  Index Only Scan using properties_pkey on public.properties p  (cost=0.28..62.28 rows=2000 width=4) (actual time=0.003..0.154 rows=2000 loops=1)
+                                                        Output: p.id
+                                                        Heap Fetches: 289
+                                                        Buffers: shared hit=12
+                                                  ->  Materialize  (cost=2436.02..2466.04 rows=1000 width=4) (actual time=0.011..0.019 rows=366 loops=2000)
+                                                        Output: (((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date)
+                                                        Buffers: shared hit=936
+                                                        ->  Result  (cost=2436.02..2461.04 rows=1000 width=4) (actual time=21.361..21.440 rows=366 loops=1)
+                                                              Output: ((generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)))::date
+                                                              Buffers: shared hit=936
+                                                              InitPlan 1 (returns $0)
+                                                                ->  Aggregate  (cost=1218.00..1218.01 rows=1 width=4) (actual time=14.616..14.618 rows=1 loops=1)
+                                                                      Output: min(date(bookings.created_at))
+                                                                      Buffers: shared hit=468
+                                                                      ->  Seq Scan on public.bookings  (cost=0.00..968.00 rows=50000 width=8) (actual time=0.003..9.621 rows=50013 loops=1)
+                                                                            Output: bookings.id, bookings.guest_id, bookings.property_id, bookings.total_cost, bookings.nights, bookings.status, bookings.created_at
+                                                                            Buffers: shared hit=468
+                                                              InitPlan 2 (returns $1)
+                                                                ->  Aggregate  (cost=1218.00..1218.01 rows=1 width=4) (actual time=6.547..6.552 rows=1 loops=1)
+                                                                      Output: max(date(bookings_1.created_at))
+                                                                      Buffers: shared hit=468
+                                                                      ->  Seq Scan on public.bookings bookings_1  (cost=0.00..968.00 rows=50000 width=8) (actual time=0.006..1.506 rows=50013 loops=1)
+                                                                            Output: bookings_1.id, bookings_1.guest_id, bookings_1.property_id, bookings_1.total_cost, bookings_1.nights, bookings_1.status, bookings_1.created_at
+                                                                            Buffers: shared hit=468
+                                                              ->  ProjectSet  (cost=0.00..5.02 rows=1000 width=8) (actual time=21.361..21.400 rows=366 loops=1)
+                                                                    Output: generate_series(($0)::timestamp with time zone, ($1)::timestamp with time zone, '1 day'::interval)
+                                                                    Buffers: shared hit=936
+                                                                    ->  Result  (cost=0.00..0.01 rows=1 width=0) (actual time=0.000..0.000 rows=1 loops=1)
+                                      ->  Sort  (cost=4870.41..4995.41 rows=50000 width=18) (actual time=20.324..22.215 rows=50013 loops=1)
+                                            Output: b.total_cost, b.property_id, b.created_at, (date(b.created_at))
+                                            Sort Key: b.property_id, (date(b.created_at))
+                                            Sort Method: quicksort  Memory: 3964kB
+                                            Buffers: shared hit=468
+                                            ->  Seq Scan on public.bookings b  (cost=0.00..968.00 rows=50000 width=18) (actual time=0.010..6.080 rows=50013 loops=1)
+                                                  Output: b.total_cost, b.property_id, b.created_at, date(b.created_at)
+                                                  Buffers: shared hit=468
+Planning:
+  Buffers: shared hit=24
+Planning Time: 0.182 ms
+Execution Time: 1218.371 ms
+
+legacy_same_scope
+
+WITH dates AS (SELECT generate_series(((CURRENT_TIMESTAMP AT TIME ZONE 'UTC')::date-35)::timestamp,
+ ((CURRENT_TIMESTAMP AT TIME ZONE 'UTC')::date)::timestamp,interval '1 day')::date AS day),
+calendar AS (SELECT p.id, d.day FROM properties p CROSS JOIN dates d WHERE p.id=ANY(ARRAY[1,2,3,4,5])),
+daily AS (SELECT c.id,c.day,COALESCE(SUM(b.total_cost),0) AS revenue FROM calendar c
+ LEFT JOIN bookings b ON b.property_id=c.id AND (b.created_at AT TIME ZONE 'UTC')::date=c.day
+ GROUP BY c.id,c.day),
+moving AS (SELECT id,day,revenue,AVG(revenue) OVER(PARTITION BY id ORDER BY day
+ ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg7 FROM daily)
+SELECT id,day,revenue,ROUND(avg7,2),DENSE_RANK() OVER(PARTITION BY day ORDER BY avg7 DESC)
+FROM moving WHERE day >= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')::date-29 ORDER BY day,id
+
+Incremental Sort  (cost=2872.14..2889.00 rows=333 width=112) (actual time=0.875..0.930 rows=150 loops=1)
+  Output: moving.id, moving.day, moving.revenue, (round(moving.avg7, 2)), (dense_rank() OVER (?)), moving.avg7
+  Sort Key: moving.day, moving.id
+  Presorted Key: moving.day
+  Full-sort Groups: 5  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
+  Buffers: shared hit=23
+  ->  WindowAgg  (cost=2872.09..2879.58 rows=333 width=112) (actual time=0.856..0.904 rows=150 loops=1)
+        Output: moving.id, moving.day, moving.revenue, round(moving.avg7, 2), dense_rank() OVER (?), moving.avg7
+        Buffers: shared hit=23
+        ->  Sort  (cost=2872.09..2872.92 rows=333 width=72) (actual time=0.854..0.858 rows=150 loops=1)
+              Output: moving.day, moving.avg7, moving.id, moving.revenue
+              Sort Key: moving.day, moving.avg7 DESC
+              Sort Method: quicksort  Memory: 31kB
+              Buffers: shared hit=23
+              ->  Subquery Scan on moving  (cost=2815.64..2858.14 rows=333 width=72) (actual time=0.739..0.831 rows=150 loops=1)
+                    Output: moving.day, moving.avg7, moving.id, moving.revenue
+                    Filter: (moving.day >= (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 29))
+                    Rows Removed by Filter: 30
+                    Buffers: shared hit=23
+                    ->  WindowAgg  (cost=2815.64..2835.64 rows=1000 width=72) (actual time=0.736..0.810 rows=180 loops=1)
+                          Output: p.id, (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date), (COALESCE(sum(b.total_cost), '0'::numeric)), avg((COALESCE(sum(b.total_cost), '0'::numeric))) OVER (?)
+                          Buffers: shared hit=23
+                          ->  Sort  (cost=2815.64..2818.14 rows=1000 width=40) (actual time=0.734..0.738 rows=180 loops=1)
+                                Output: p.id, (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date), (COALESCE(sum(b.total_cost), '0'::numeric))
+                                Sort Key: p.id, (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date)
+                                Sort Method: quicksort  Memory: 32kB
+                                Buffers: shared hit=23
+                                ->  HashAggregate  (cost=2753.31..2765.81 rows=1000 width=40) (actual time=0.687..0.706 rows=180 loops=1)
+                                      Output: p.id, (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date), COALESCE(sum(b.total_cost), '0'::numeric)
+                                      Group Key: p.id, (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date)
+                                      Batches: 1  Memory Usage: 129kB
+                                      Buffers: shared hit=23
+                                      ->  Nested Loop Left Join  (cost=0.58..2715.81 rows=5000 width=14) (actual time=0.025..0.662 rows=193 loops=1)
+                                            Output: p.id, (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date), b.total_cost
+                                            Join Filter: (((b.created_at AT TIME ZONE 'UTC'::text))::date = (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date))
+                                            Rows Removed by Join Filter: 5625
+                                            Buffers: shared hit=23
+                                            ->  Nested Loop  (cost=0.28..125.02 rows=5000 width=8) (actual time=0.005..0.027 rows=180 loops=1)
+                                                  Output: p.id, (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date)
+                                                  Buffers: shared hit=11
+                                                  ->  Index Only Scan using properties_pkey on public.properties p  (cost=0.28..17.48 rows=5 width=4) (actual time=0.002..0.004 rows=5 loops=1)
+                                                        Output: p.id
+                                                        Index Cond: (p.id = ANY ('{1,2,3,4,5}'::integer[]))
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=11
+                                                  ->  Materialize  (cost=0.00..47.54 rows=1000 width=4) (actual time=0.000..0.003 rows=36 loops=5)
+                                                        Output: (((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date)
+                                                        ->  Result  (cost=0.00..42.54 rows=1000 width=4) (actual time=0.002..0.008 rows=36 loops=1)
+                                                              Output: ((generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)))::date
+                                                              ->  ProjectSet  (cost=0.00..5.04 rows=1000 width=8) (actual time=0.001..0.005 rows=36 loops=1)
+                                                                    Output: generate_series(((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 35))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)
+                                                                    ->  Result  (cost=0.00..0.01 rows=1 width=0) (actual time=0.000..0.000 rows=1 loops=1)
+                                            ->  Memoize  (cost=0.30..4.74 rows=25 width=18) (actual time=0.000..0.001 rows=31 loops=180)
+                                                  Output: b.total_cost, b.property_id, b.created_at
+                                                  Cache Key: p.id
+                                                  Cache Mode: logical
+                                                  Hits: 175  Misses: 5  Evictions: 0  Overflows: 0  Memory Usage: 9kB
+                                                  Buffers: shared hit=12
+                                                  ->  Index Only Scan using idx_bookings_property_date on public.bookings b  (cost=0.29..4.73 rows=25 width=18) (actual time=0.002..0.003 rows=31 loops=5)
+                                                        Output: b.total_cost, b.property_id, b.created_at
+                                                        Index Cond: (b.property_id = p.id)
+                                                        Heap Fetches: 13
+                                                        Buffers: shared hit=12
+Planning:
+  Buffers: shared hit=13
+Planning Time: 0.208 ms
+Execution Time: 0.966 ms
+
+optimized_workflow_2
+SELECT * FROM revenue_analytics((CURRENT_TIMESTAMP AT TIME ZONE 'UTC')::date-29, (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')::date, ARRAY[1,2,3,4,5])
+Subquery Scan on revenue_analytics  (cost=734.58..736.45 rows=25 width=80) (actual time=0.243..0.305 rows=150 loops=1)
+  Output: revenue_analytics.property_id, revenue_analytics.booking_date, revenue_analytics.daily_total, revenue_analytics.moving_avg_7d, revenue_analytics.revenue_momentum_rank
+  Buffers: shared hit=23
+  ->  Incremental Sort  (cost=734.58..736.20 rows=25 width=112) (actual time=0.243..0.297 rows=150 loops=1)
+        Output: moving.id, moving.day, moving.daily_total, (round(moving.moving_avg, 2)), (dense_rank() OVER (?)), moving.moving_avg
+        Sort Key: moving.day, moving.id
+        Presorted Key: moving.day
+        Full-sort Groups: 5  Sort Method: quicksort  Average Memory: 27kB  Peak Memory: 27kB
+        Buffers: shared hit=23
+        ->  WindowAgg  (cost=734.55..735.11 rows=25 width=112) (actual time=0.225..0.273 rows=150 loops=1)
+              Output: moving.id, moving.day, moving.daily_total, round(moving.moving_avg, 2), dense_rank() OVER (?), moving.moving_avg
+              Buffers: shared hit=23
+              ->  Sort  (cost=734.55..734.61 rows=25 width=72) (actual time=0.224..0.228 rows=150 loops=1)
+                    Output: moving.day, moving.moving_avg, moving.id, moving.daily_total
+                    Sort Key: moving.day, moving.moving_avg DESC
+                    Sort Method: quicksort  Memory: 31kB
+                    Buffers: shared hit=23
+                    ->  Subquery Scan on moving  (cost=458.97..733.97 rows=25 width=72) (actual time=0.102..0.202 rows=150 loops=1)
+                          Output: moving.day, moving.moving_avg, moving.id, moving.daily_total
+                          Filter: ((moving.day <= ((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date) AND (moving.day >= (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 29)))
+                          Rows Removed by Filter: 30
+                          Buffers: shared hit=23
+                          ->  WindowAgg  (cost=458.97..571.47 rows=5000 width=72) (actual time=0.098..0.172 rows=180 loops=1)
+                                Output: properties.id, ((d_1.d)::date), COALESCE(d.revenue, '0'::numeric), avg(COALESCE(d.revenue, '0'::numeric)) OVER (?)
+                                Buffers: shared hit=23
+                                ->  Sort  (cost=458.97..471.47 rows=5000 width=40) (actual time=0.093..0.098 rows=180 loops=1)
+                                      Output: properties.id, ((d_1.d)::date), d.revenue
+                                      Sort Key: properties.id, ((d_1.d)::date)
+                                      Sort Method: quicksort  Memory: 30kB
+                                      Buffers: shared hit=23
+                                      ->  Hash Left Join  (cost=22.69..151.78 rows=5000 width=40) (actual time=0.027..0.067 rows=180 loops=1)
+                                            Output: properties.id, (d_1.d)::date, d.revenue
+                                            Inner Unique: true
+                                            Hash Cond: ((properties.id = d.property_id) AND ((d_1.d)::date = d.day))
+                                            Buffers: shared hit=23
+                                            ->  Nested Loop  (cost=0.31..90.02 rows=5000 width=12) (actual time=0.007..0.024 rows=180 loops=1)
+                                                  Output: properties.id, d_1.d
+                                                  Buffers: shared hit=11
+                                                  ->  Function Scan on pg_catalog.generate_series d_1  (cost=0.03..10.03 rows=1000 width=8) (actual time=0.005..0.006 rows=36 loops=1)
+                                                        Output: d_1.d
+                                                        Function Call: generate_series((((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 29) - 6))::timestamp without time zone, (((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date)::timestamp without time zone, '1 day'::interval)
+                                                  ->  Materialize  (cost=0.28..17.50 rows=5 width=4) (actual time=0.000..0.000 rows=5 loops=36)
+                                                        Output: properties.id
+                                                        Buffers: shared hit=11
+                                                        ->  Index Only Scan using properties_pkey on public.properties  (cost=0.28..17.48 rows=5 width=4) (actual time=0.001..0.003 rows=5 loops=1)
+                                                              Output: properties.id
+                                                              Index Cond: (properties.id = ANY ('{1,2,3,4,5}'::integer[]))
+                                                              Heap Fetches: 0
+                                                              Buffers: shared hit=11
+                                            ->  Hash  (cost=22.21..22.21 rows=12 width=40) (actual time=0.019..0.019 rows=14 loops=1)
+                                                  Output: d.revenue, d.property_id, d.day
+                                                  Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                  Buffers: shared hit=12
+                                                  ->  Subquery Scan on d  (cost=21.88..22.21 rows=12 width=40) (actual time=0.015..0.017 rows=14 loops=1)
+                                                        Output: d.revenue, d.property_id, d.day
+                                                        Buffers: shared hit=12
+                                                        ->  HashAggregate  (cost=21.88..22.09 rows=12 width=40) (actual time=0.015..0.016 rows=14 loops=1)
+                                                              Output: b.property_id, (((b.created_at AT TIME ZONE 'UTC'::text))::date), sum(b.total_cost)
+                                                              Group Key: b.property_id, ((b.created_at AT TIME ZONE 'UTC'::text))::date
+                                                              Batches: 1  Memory Usage: 24kB
+                                                              Buffers: shared hit=12
+                                                              ->  Index Only Scan using idx_bookings_property_date on public.bookings b  (cost=0.32..21.79 rows=12 width=14) (actual time=0.003..0.010 rows=27 loops=1)
+                                                                    Output: b.property_id, ((b.created_at AT TIME ZONE 'UTC'::text))::date, b.total_cost
+                                                                    Index Cond: ((b.property_id = ANY ('{1,2,3,4,5}'::integer[])) AND (b.created_at >= ((((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date - 29) - 6))::timestamp without time zone AT TIME ZONE 'UTC'::text)) AND (b.created_at < (((((CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text))::date + 1))::timestamp without time zone AT TIME ZONE 'UTC'::text)))
+                                                                    Heap Fetches: 13
+                                                                    Buffers: shared hit=12
+Planning Time: 0.205 ms
+Execution Time: 0.329 ms
+
+property_summary
+SELECT * FROM mv_property_summary WHERE property_id=1
+Index Scan using idx_mv_property_summary_id on public.mv_property_summary  (cost=0.28..8.29 rows=1 width=53) (actual time=0.009..0.010 rows=1 loops=1)
+  Output: property_id, title, total_bookings, total_nights_booked, total_revenue
+  Index Cond: (mv_property_summary.property_id = 1)
+  Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=54
+Planning Time: 0.504 ms
+Execution Time: 0.014 ms
+
+audit_page
+SELECT * FROM wallet_audit_logs WHERE guest_id=1 ORDER BY timestamp,id LIMIT 21
+Limit  (cost=0.42..2.46 rows=21 width=37) (actual time=0.042..0.044 rows=21 loops=1)
+  Output: id, guest_id, amount_changed, action_type, balance_after, "timestamp"
+  Buffers: shared hit=4
+  ->  Index Only Scan using idx_audit_guest_time on public.wallet_audit_logs  (cost=0.42..10.17 rows=100 width=37) (actual time=0.042..0.043 rows=21 loops=1)
+        Output: id, guest_id, amount_changed, action_type, balance_after, "timestamp"
+        Index Cond: (wallet_audit_logs.guest_id = 1)
+        Heap Fetches: 0
+        Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=78
+Planning Time: 0.192 ms
+Execution Time: 0.048 ms

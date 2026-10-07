@@ -1,0 +1,36 @@
+# Start the database engines only; React/Express run through the existing npm commands.
+# Named volumes preserve database data across ordinary container restarts.
+# On macOS, Docker Desktop must be running before invoking docker compose.
+services:
+  postgres:
+    image: postgres:16
+    # Sample local PostgreSQL account/database created by the official entrypoint.
+    environment:
+      POSTGRES_USER: stayspot
+      POSTGRES_PASSWORD: stayspot
+      POSTGRES_DB: stayspot
+    # Bind the host listener to loopback; the container keeps its normal internal port.
+    ports: ["127.0.0.1:${POSTGRES_PORT:-5432}:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    # --wait uses this readiness probe instead of merely checking that a process exists.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stayspot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  mongo:
+    # MongoDB 8 rejects Docker Desktop kernels 6.19 through 7.0.13.
+    # Version 7 supports every StaySpot pipeline and the assignment's MongoDB 6+
+    # requirement.
+    image: mongo:7.0
+    ports: ["127.0.0.1:${MONGO_PORT:-27017}:27017"]
+    volumes: ["mongodata:/data/db"]
+    # A successful ping confirms the database can serve actual driver requests.
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  pgdata:
+  mongodata:

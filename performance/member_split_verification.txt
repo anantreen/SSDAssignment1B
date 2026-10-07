@@ -1,0 +1,38 @@
+Identical initial rendered HTML: browse
+Identical initial rendered HTML: transaction
+Identical initial rendered HTML: audit
+Identical initial rendered HTML: analytics
+Identical initial rendered HTML: map
+Identical initial rendered HTML: reviews
+Identical rendered HTML with fixtures: Browse
+Identical rendered HTML with fixtures: Transaction
+Identical rendered HTML with fixtures: Audit
+Identical rendered HTML with fixtures: Heading
+Identical rendered HTML with fixtures: Pager
+Identical rendered HTML with fixtures: Picker
+Identical rendered HTML with fixtures: DataState
+Identical rendered HTML with fixtures: HouseArt
+Identical rendered HTML with fixtures: LineChart
+Exact stylesheet byte comparison passed
+Status-action markup unchanged for all three statuses
+All MongoDB query builder outputs unchanged
+Identical API status/body: GET /api/health
+Identical API status/body: GET /api/guests?limit=5&after=1
+Identical API status/body: GET /api/guests/1
+Identical API status/body: GET /api/properties?limit=5&search=Hyderabad
+Identical API status/body: GET /api/properties/1
+Identical API status/body: GET /api/bookings?limit=5&guest_id=1
+Identical API status/body: GET /api/bookings/1
+Identical API status/body: GET /api/audit?guest_id=1&limit=5
+Identical API status/body: GET /api/analytics?from=2026-10-01&to=2026-10-07
+Identical API status/body: GET /api/search?latitude=0&longitude=0
+Identical API status/body: GET /api/reviews?property_id=1
+Identical API status/body: GET /api/not-a-route
+Identical API status/body: GET /api/guests/2147483647
+Identical API status/body: GET /api/search?latitude=91&longitude=0
+Identical API status/body: POST /api/bookings
+Identical API status/body: POST /api/bookings
+Identical API status/body: PATCH /api/bookings/2147483647/status
+Numbered psql entry points initialized a fresh database successfully; two-night booking, trigger debit and materialized nights/revenue verified.
+Legacy mongosh setup and Workflow 3/4 entry points executed successfully after delegation.
+Vite dev served the member modules outside web/ and preserved the API proxy without configuration changes.

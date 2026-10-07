@@ -1,0 +1,13 @@
+# Format source only; raw measurements, generated artifacts and dependencies stay intact.
+node_modules/
+dist/
+.git/
+.venv/
+venv/
+__pycache__/
+performance/
+package-lock.json
+docs/screenshots/
+docs/design/*.svg
+docs/*.png
+docs/*.mp4
