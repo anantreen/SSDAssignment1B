@@ -1,6 +1,6 @@
 # SSDAssignment1B — StaySpot Assignment 2
 
-A working browser front end for StaySpot, with a PostgreSQL/MongoDB API and all four inherited workflows. The local folder is **StaySpot2**; the product name is **StaySpot**.
+A working browser front end for StaySpot, with a PostgreSQL/MongoDB API and all four inherited workflows. The clone instructions use the repository folder **SSDAssignment1B**; the product name is **StaySpot**.
 
 **Source repository:** https://github.com/git-adityamishra/27_a1
 **Inherited main commit:** `774fbd2f33463c3e88352bdb0b7988165c65abcf`
@@ -8,17 +8,113 @@ A working browser front end for StaySpot, with a PostgreSQL/MongoDB API and all 
 **Final commit hash:** resolve the current published revision with `git rev-parse HEAD` or [GitHub commits](https://github.com/anantreen/SSDAssignment1B/commits/main). The packaging script stamps that exact committed SHA into the ZIP README.
 **Demo walkthrough:** [demo_walkthrough.mp4](docs/demo_walkthrough.mp4) — captioned actual live-browser captures, under five minutes; method disclosed in [browser verification](docs/browser_verification.md). Add the team's uploaded share link here if an external demo URL is required.
 
-## Run the front end
+## Clone and run from a new machine
 
-Node.js 22.12+ is required. After the database setup below:
+Use a Bash terminal on macOS/Linux. On Windows, use Ubuntu in WSL 2 and enable Docker Desktop's WSL integration; run all commands inside that WSL terminal, rather than mixing Windows and WSL installations.
+
+### 1. Install the prerequisites
+
+| Tool | Required for | Install |
+|---|---|---|
+| Git | Clone the repository | [Git downloads](https://git-scm.com/downloads) |
+| Node.js 22.12+ and npm | API, React dependencies and production build | [Node.js downloads](https://nodejs.org/en/download) |
+| Python 3.11+ with pip/venv | Database seeders and Python checks | [Python downloads](https://www.python.org/downloads/) |
+| Docker with Compose v2 | PostgreSQL 16 and MongoDB 7.0 services | [Docker Desktop](https://docs.docker.com/desktop/) or [Docker Engine](https://docs.docker.com/engine/install/) |
+| PostgreSQL client `psql` | Apply the SQL scripts | [PostgreSQL downloads](https://www.postgresql.org/download/) |
+| MongoDB Shell `mongosh` | Create validators/indexes and run workflows | [mongosh installation](https://www.mongodb.com/docs/mongodb-shell/install/) |
+
+Docker supplies the **database servers**. The existing setup script also requires the **psql and mongosh clients on your host/WSL PATH**; you do not need additional native database servers.
+
+On macOS with [Homebrew](https://brew.sh) installed, the client-only installation is:
 
 ```bash
+brew install libpq mongosh
+export PATH="$(brew --prefix libpq)/bin:$PATH"
+```
+
+[libpq package details](https://formulae.brew.sh/formula/libpq) and [mongosh package details](https://formulae.brew.sh/formula/mongosh) describe these client packages. That PATH adjustment must be present in the terminal that runs setup; add it to your shell configuration if you want it to persist. On Ubuntu/WSL, install `postgresql-client` and `python3-venv` through apt and install mongosh using its linked Linux instructions. Keep Node/Python/Git and the client tools available in the same WSL environment.
+
+Check the prerequisites before proceeding:
+
+```bash
+git --version
+node --version
+npm --version
+python3 --version
+psql --version
+mongosh --version
+docker compose version
+```
+
+Start Docker Desktop and wait for its engine to be ready. On supported Docker Desktop installations, `docker desktop start` does this from the terminal; opening the Docker Desktop app also works. For Docker Engine on Linux, start its service using your distribution's setup instructions. Verify readiness with `docker info`.
+
+### 2. First-time setup and production build
+
+Run this sequence once against the new project's empty database volumes:
+
+```bash
+git clone https://github.com/anantreen/SSDAssignment1B.git
+cd SSDAssignment1B
+
+# Local settings are intentionally not committed. Create your own from the sample.
+cp .env.example .env
+
+# Install Python seeders and the locked JavaScript dependency tree.
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r data_generation/requirements.txt
 npm ci
+
+# The Docker engine must already be running.
+docker info
+docker compose up -d --wait
+
+# Create schema/indexes/workflows, then seed both databases.
+bash scripts/setup.sh
+
+# Build the front end and serve it through the Express API.
 npm run build
 npm start
 ```
 
-Open http://127.0.0.1:3000. For development, npm run dev serves the UI at http://127.0.0.1:5173 and proxies /api to port 3000. The configured app is already running at port 3000 in this workspace. A .env.example is supplied; the ignored local .env points to the verified isolated services.
+Open **http://127.0.0.1:3000**. Keep the `npm start` terminal running. The first run downloads database images and generates 50,000 bookings, 100,000 audits and 500,000 search sessions, so it takes longer than later starts. Run `npm start` after `npm run build`; there is no prebuilt `dist/` committed in Git.
+
+In a **second terminal** in the cloned folder, verify the app and important workflows:
+
+```bash
+curl http://127.0.0.1:3000/api/health
+npm test
+```
+
+Health should return `ok: true`. The API tests should report 12 passes and zero skipped tests when .env and both seeded databases are available. Sample actors include guest #1, Ananya Rao; select another guest using the header for demonstrations. Browser map tiles require internet access.
+
+### 3. Starting it again and developing
+
+The named Docker volumes retain the schema and data. On later runs, do **not** rerun setup or the full seeders:
+
+```bash
+cd SSDAssignment1B
+# Start Docker Desktop/Engine first if it stopped.
+docker compose up -d --wait
+npm start
+```
+
+For front-end development, stop the existing app with Ctrl+C, then use `npm run dev` instead of `npm start`. Open http://127.0.0.1:5173; Vite proxies /api to the API on port 3000. Use the default API port for this development command. After production source changes, rerun `npm run build` before `npm start`.
+
+To stop: Ctrl+C stops the app, and `docker compose stop` stops the engines while retaining their data. `docker compose start --wait` resumes already-created services. React/API credentials are read from your own .env; the original developer's hidden runtime folders are not needed by a new clone.
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| docker.sock is missing / cannot connect to Docker | Start Docker Desktop/Engine; wait for `docker info` to succeed. Activating Python's venv does not start Docker. |
+| `psql` or `mongosh`: command not found | Install the listed clients and put their binaries on PATH in this terminal. |
+| `venv` / ensurepip missing on Ubuntu | Install the distribution's `python3-venv` package and recreate .venv. |
+| Port 5432 or 27017 is already occupied | Change `POSTGRES_PORT`/`MONGO_PORT` and the matching connection URL in .env before starting Compose; examples appear below. |
+| relation/table already exists during setup | Setup was run on an initialized database. Skip setup on later runs and use the restart commands. |
+| API cannot find dist/index.html / page unavailable | Run `npm run build`, then `npm start` from the project root. |
+| Port 3000 is in use | Stop the previous app instance. For production you may change PORT in .env and use that URL; the development proxy expects 3000. |
+| Map has no recent search pins after a later restart | SearchSessions expire after two hours; add a pin in the UI or run the telemetry-only replenishment command below. |
 
 ## Code sections for four members
 
@@ -77,21 +173,9 @@ Twelve API integration cases and eight database checks passed. They test booking
 - Geospatial origin coordinates are [longitude, latitude]; a strict 5 km query and explicit recency filter accompany a two-hour TTL. Hotspots use approximate grid cells, rather than DBSCAN. Reviews use integer stars and are scoped to the selected property over the past year.
 - The audit table rejects ordinary UPDATE/DELETE/TRUNCATE; a privileged database owner can bypass triggers. This is a local teaching demo, without real authentication, property/date availability, refunds or deployment migrations.
 
-## Clean-machine database setup
+## Database configuration and lifecycle
 
-Requires PostgreSQL 16 (client psql), MongoDB 7+ (mongosh), Python 3.11+, and optionally Docker Compose. The Docker daemon must be running. Run from this repository's root. The SQL scripts target an **empty database** and the seeders refuse a nonempty dataset; no existing database is silently deleted.
-
-```bash
-cp .env.example .env
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r data_generation/requirements.txt
-# macOS: start the installed Docker Desktop engine before running Compose.
-docker desktop start
-docker info
-docker compose up -d --wait
-bash scripts/setup.sh
-```
+The quickstart above already installs and seeds the databases. This section documents that configuration and the optional native-server path; it is not another first-run sequence. `scripts/setup.sh` targets empty databases and intentionally refuses duplicate seeding.
 
 The script loads .env, installs all six SQL files and the MongoDB validators/indexes, then seeds 1,000 guests, 2,000 properties, 50,000 bookings, 100,000 trigger audit entries, 500,000 city-clustered search sessions, 50,000 reviews and matching property catalogs. MongoDB setup runs before its seed data so validation is exercised during insertion. COPY/bulk batches keep memory bounded; errors exit unsuccessfully.
 
@@ -99,11 +183,18 @@ If Compose reports that docker.sock does not exist, Docker Desktop is stopped. S
 
 If another MongoDB already uses port 27017, set `MONGO_PORT=27019` and `MONGO_URL=mongodb://127.0.0.1:27019` in .env. Compose and the app must use the same host port. `POSTGRES_PORT` similarly controls PostgreSQL's host port; update `DATABASE_URL` when changing it. Existing local database services do not need to be stopped.
 
-Compose uses MongoDB 7.0 because MongoDB 8 has a [documented incompatibility with Linux kernels 6.19 through 7.0.13](https://www.mongodb.com/docs/manual/release-notes/8.0/), including this Mac's Docker Desktop kernel 7.0.12. The pipeline features used by StaySpot are available in 7.0. Startup and integration-test verification of this Docker configuration are pending; the earlier native MongoDB 8 performance reports remain records of their original runs. The UI and API code are unchanged.
+Compose uses MongoDB 7.0 because MongoDB 8 has a [documented incompatibility with Linux kernels 6.19 through 7.0.13](https://www.mongodb.com/docs/manual/release-notes/8.0/), including this Mac's Docker Desktop kernel 7.0.12. The Docker path was verified from a fresh Git clone using PostgreSQL 16.15 and MongoDB 7.0.40: full seeding, production serving, 12 API tests and eight database checks passed. [Fresh-clone verification details](docs/clone_validation.md) record the tested scope. The earlier native MongoDB 8 performance reports remain records of their original runs. The UI and API code are unchanged.
 
 For databases installed without Docker, create an empty PostgreSQL database and an empty MongoDB database, edit .env to their connection details, then run the same setup script. PostgreSQL must permit installing pg_trgm. Do not run both projects' default Docker port mappings simultaneously; use separate ports/database names or one chosen project at a time.
 
-The earlier isolated verification services use PostgreSQL port 55432, MongoDB port 27018, and separate stayspot_a1/stayspot_a2 databases. These databases and the Python verification environment live outside the submission folders and remain separate from Docker. Docker uses the .env.example defaults unless host ports are overridden in .env; on this Mac, Docker MongoDB uses port 27019 to avoid the existing local MongoDB on 27017.
+New clones use the defaults in .env.example: PostgreSQL on 5432 and MongoDB on 27017. Only the earlier developer verification environment used ports 55432/27018; friends do not need those services or any hidden runtime folder. If the default ports are busy, change the host-port variables and their corresponding URLs together, for example:
+
+```dotenv
+POSTGRES_PORT=55434
+DATABASE_URL=postgresql://stayspot:stayspot@127.0.0.1:55434/stayspot
+MONGO_PORT=27021
+MONGO_URL=mongodb://127.0.0.1:27021
+```
 
 Search sessions intentionally expire after two hours. Before a later stress-test/demo, append fresh telemetry without resetting wallets:
 
