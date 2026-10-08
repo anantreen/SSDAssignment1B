@@ -1,0 +1,401 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1280" viewBox="0 0 1440 1280" role="img">
+<title>StaySpot — Browse</title>
+<g data-section="shell">
+<rect x="0" y="0" width="1440" height="1280" rx="0" fill="#fafafa" stroke="transparent" opacity="1.0"/>
+<rect x="0" y="0" width="220" height="1190" rx="0" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="22" y="34" width="37" height="37" rx="10" fill="#555555" stroke="transparent" opacity="1.0"/>
+<svg x="28" y="40" width="25" height="25" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+<text x="68" y="64.1" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#555555">
+<tspan x="68" dy="0">StaySpot</tspan>
+</text>
+<text x="181" y="64.1" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#555555">
+<tspan x="181" dy="0">.</tspan>
+</text>
+<text x="34" y="130.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#777777">
+<tspan x="34" dy="0">YOUR WORKSPACE</tspan>
+</text>
+<rect x="22" y="150" width="176" height="47" rx="7" fill="#eeeeee" stroke="transparent" opacity="1.0"/>
+<ellipse cx="180.5" cy="173.5" rx="2.5" ry="2.5" fill="#555555" stroke="transparent" opacity="1.0"/>
+<svg x="36" y="164" width="19" height="19" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+<text x="69" y="177.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="69" dy="0">Browse</tspan>
+</text>
+<svg x="36" y="217" width="19" height="19" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-plus"><path d="M8 2v4"></path><path d="M16 2v4"></path><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"></path><path d="M3 10h18"></path><path d="M16 19h6"></path><path d="M19 16v6"></path></svg>
+<text x="69" y="230.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="69" dy="0">Book a stay</tspan>
+</text>
+<svg x="36" y="270" width="19" height="19" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-receipt-text"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path><path d="M14 8H8"></path><path d="M16 12H8"></path><path d="M13 16H8"></path></svg>
+<text x="69" y="283.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="69" dy="0">Audit trail</tspan>
+</text>
+<svg x="36" y="323" width="19" height="19" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-no-axes-combined"><path d="M12 16v5"></path><path d="M16 14v7"></path><path d="M20 10v11"></path><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"></path><path d="M4 18v3"></path><path d="M8 14v7"></path></svg>
+<text x="69" y="336.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="69" dy="0">Analytics</tspan>
+</text>
+<svg x="36" y="376" width="19" height="19" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="69" y="389.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="69" dy="0">Search map</tspan>
+</text>
+<svg x="36" y="429" width="19" height="19" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+<text x="69" y="442.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="69" dy="0">Reviews</tspan>
+</text>
+<svg x="34" y="534" width="32" height="32" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="34" y="604.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#555555">
+<tspan x="34" dy="0">A little closer</tspan>
+<tspan x="34" dy="29.4">to feeling at</tspan>
+<tspan x="34" dy="29.4">home.</tspan>
+</text>
+<text x="34" y="701.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="34" dy="0">VACATION RENTALS &amp;</tspan>
+<tspan x="34" dy="11.2">EXPERIENCES</tspan>
+</text>
+<polyline points="32,755 188,755" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="32" y="780.5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="10" font-weight="400" fill="#777777">
+<tspan x="32" dy="0">Project 03           SSD · 2026</tspan>
+</text>
+<rect x="220" y="0" width="1220" height="88" rx="0" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<text x="262" y="48.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="262" dy="0">Workspace    /</tspan>
+</text>
+<text x="349" y="48.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#292929">
+<tspan x="349" dy="0">Browse</tspan>
+</text>
+<ellipse cx="1099.0" cy="44.0" rx="3.0" ry="3.0" fill="#555555" stroke="transparent" opacity="1.0"/>
+<text x="1108" y="47.5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="10" font-weight="400" fill="#777777">
+<tspan x="1108" dy="0">Live databases</tspan>
+</text>
+<ellipse cx="1231.5" cy="43.5" rx="16.5" ry="16.5" fill="#eeeeee" stroke="transparent" opacity="1.0"/>
+<text x="1223" y="46.5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="10" font-weight="700" fill="#555555">
+<tspan x="1223" dy="0">AR</tspan>
+</text>
+<text x="1258" y="40.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="1258" dy="0">Ananya Rao</tspan>
+</text>
+<text x="1258" y="57.5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="10" font-weight="400" fill="#777777">
+<tspan x="1258" dy="0">₹50,000.00 in wallet</tspan>
+</text>
+<svg x="1381" y="37" width="15" height="15" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"></path></svg>
+<text x="262" y="133.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#777777">
+<tspan x="262" dy="0">YOUR NEXT CHAPTER</tspan>
+</text>
+<text x="262" y="184.15" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="39" font-weight="400" fill="#292929">
+<tspan x="262" dy="0">A place for every possibility.</tspan>
+</text>
+<text x="262" y="224.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="262" dy="0">Discover thoughtful spaces, familiar comforts, and a little room to explore.</tspan>
+</text>
+</g>
+<g data-section="browse-banner">
+<rect x="262" y="258" width="1136" height="250" rx="9" fill="#555555" stroke="transparent" opacity="1.0"/>
+<svg x="298" y="286" width="15" height="15" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="320" y="296.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="700" fill="#ffffff">
+<tspan x="320" dy="0">MADE FOR SLOWER DAYS</tspan>
+</text>
+<text x="298" y="343.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="31" font-weight="400" fill="#ffffff">
+<tspan x="298" dy="0">Good stays.</tspan>
+<tspan x="298" dy="43.4">Great beginnings.</tspan>
+</text>
+<text x="298" y="411.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#ffffff">
+<tspan x="298" dy="0">From city corners to quiet courtyards,</tspan>
+<tspan x="298" dy="15.399999999999999">find somewhere that feels like you.</tspan>
+</text>
+<rect x="298" y="450" width="140" height="36" rx="6" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<text x="314" y="472.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#555555">
+<tspan x="314" dy="0">Book a stay</tspan>
+</text>
+<svg x="408" y="461" width="17" height="17" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+<rect x="810" y="264" width="570" height="237" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="810,264 1380,501" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="1380,264 810,501" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="822" y="382.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="822" dy="0">Property illustration</tspan>
+</text>
+</g>
+<g data-section="browse-toolbar">
+<text x="262" y="566.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="262" dy="0">Properties</tspan>
+</text>
+<text x="353" y="566.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="353" dy="0">Guests</tspan>
+</text>
+<text x="420" y="566.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#777777">
+<tspan x="420" dy="0">Bookings</tspan>
+</text>
+<polyline points="262,579 326,579" fill="none" stroke="#555555" stroke-width="2"/>
+<rect x="1127" y="542" width="271" height="38" rx="6" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<svg x="1140" y="552" width="18" height="18" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+<text x="1166" y="564.5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="10" font-weight="400" fill="#777777">
+<tspan x="1166" dy="0">Search properties…</tspan>
+</text>
+</g>
+<g data-section="property-1">
+<rect x="262" y="602" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="267" y="603" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="267,603 526,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="526,603 267,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="279" y="670.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="279" dy="0">Property illustration</tspan>
+</text>
+<rect x="273" y="613" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="279" y="619" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="294" y="627.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="294" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="275" y="752" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="292" y="760.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="292" dy="0">Hyderabad</tspan>
+</text>
+<text x="502" y="759.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="502" dy="0">#1</tspan>
+</text>
+<text x="276" y="785.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="276" dy="0">Hyderabad Terrace Retreat 1</tspan>
+</text>
+<text x="276" y="817.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="276" dy="0">₹5,089.00</tspan>
+</text>
+<text x="357" y="816.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="357" dy="0">/ night</tspan>
+</text>
+<svg x="501" y="806" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+</g>
+<g data-section="property-2">
+<rect x="551" y="602" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="556" y="603" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="556,603 815,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="815,603 556,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="568" y="670.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="568" dy="0">Property illustration</tspan>
+</text>
+<rect x="562" y="613" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="568" y="619" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="583" y="627.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="583" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="564" y="752" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="581" y="760.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="581" dy="0">Delhi</tspan>
+</text>
+<text x="791" y="759.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="791" dy="0">#2</tspan>
+</text>
+<text x="565" y="785.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="565" dy="0">Delhi Terrace Retreat 2</tspan>
+</text>
+<text x="565" y="817.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="565" dy="0">₹4,458.00</tspan>
+</text>
+<text x="646" y="816.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="646" dy="0">/ night</tspan>
+</text>
+<svg x="790" y="806" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+</g>
+<g data-section="property-3">
+<rect x="840" y="602" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="845" y="603" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="845,603 1104,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="1104,603 845,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="857" y="670.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="857" dy="0">Property illustration</tspan>
+</text>
+<rect x="851" y="613" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="857" y="619" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="872" y="627.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="872" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="853" y="752" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="870" y="760.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="870" dy="0">Mumbai</tspan>
+</text>
+<text x="1080" y="759.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="1080" dy="0">#3</tspan>
+</text>
+<text x="854" y="785.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="854" dy="0">Mumbai Terrace Retreat 3</tspan>
+</text>
+<text x="854" y="817.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="854" dy="0">₹3,981.00</tspan>
+</text>
+<text x="935" y="816.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="935" dy="0">/ night</tspan>
+</text>
+<svg x="1079" y="806" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+</g>
+<g data-section="property-4">
+<rect x="1129" y="602" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="1134" y="603" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="1134,603 1393,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="1393,603 1134,738" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="1146" y="670.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="1146" dy="0">Property illustration</tspan>
+</text>
+<rect x="1140" y="613" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="1146" y="619" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="1161" y="627.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="1161" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="1142" y="752" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="1159" y="760.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="1159" dy="0">Bengaluru</tspan>
+</text>
+<text x="1369" y="759.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="1369" dy="0">#4</tspan>
+</text>
+<text x="1143" y="785.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="1143" dy="0">Bengaluru Garden Studio 4</tspan>
+</text>
+<text x="1143" y="817.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="1143" dy="0">₹3,000.00</tspan>
+</text>
+<text x="1224" y="816.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="1224" dy="0">/ night</tspan>
+</text>
+<svg x="1368" y="806" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+</g>
+<g data-section="property-5">
+<rect x="262" y="853" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="267" y="854" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="267,854 526,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="526,854 267,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="279" y="921.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="279" dy="0">Property illustration</tspan>
+</text>
+<rect x="273" y="864" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="279" y="870" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="294" y="878.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="294" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="275" y="1003" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="292" y="1011.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="292" dy="0">Chennai</tspan>
+</text>
+<text x="502" y="1010.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="502" dy="0">#5</tspan>
+</text>
+<text x="276" y="1036.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="276" dy="0">Chennai Garden Studio 5</tspan>
+</text>
+<text x="276" y="1068.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="276" dy="0">₹1,821.00</tspan>
+</text>
+<text x="357" y="1067.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="357" dy="0">/ night</tspan>
+</text>
+<svg x="501" y="1057" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+</g>
+<g data-section="property-6">
+<rect x="551" y="853" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="556" y="854" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="556,854 815,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="815,854 556,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="568" y="921.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="568" dy="0">Property illustration</tspan>
+</text>
+<rect x="562" y="864" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="568" y="870" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="583" y="878.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="583" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="564" y="1003" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="581" y="1011.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="581" dy="0">Hyderabad</tspan>
+</text>
+<text x="791" y="1010.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="791" dy="0">#6</tspan>
+</text>
+<text x="565" y="1036.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="565" dy="0">Hyderabad Terrace Retreat 6</tspan>
+</text>
+<text x="565" y="1068.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="565" dy="0">₹5,082.00</tspan>
+</text>
+<text x="646" y="1067.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="646" dy="0">/ night</tspan>
+</text>
+<svg x="790" y="1057" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+</g>
+<g data-section="property-7">
+<rect x="840" y="853" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="845" y="854" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="845,854 1104,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="1104,854 845,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="857" y="921.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="857" dy="0">Property illustration</tspan>
+</text>
+<rect x="851" y="864" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="857" y="870" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="872" y="878.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="872" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="853" y="1003" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="870" y="1011.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="870" dy="0">Delhi</tspan>
+</text>
+<text x="1080" y="1010.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="1080" dy="0">#7</tspan>
+</text>
+<text x="854" y="1036.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="854" dy="0">Delhi Terrace Retreat 7</tspan>
+</text>
+<text x="854" y="1068.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="854" dy="0">₹4,294.00</tspan>
+</text>
+<text x="935" y="1067.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="935" dy="0">/ night</tspan>
+</text>
+<svg x="1079" y="1057" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+</g>
+<g data-section="property-8">
+<rect x="1129" y="853" width="269" height="232" rx="9" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<rect x="1134" y="854" width="259" height="135" rx="0" fill="#eeeeee" stroke="#cccccc" opacity="1.0"/>
+<polyline points="1134,854 1393,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<polyline points="1393,854 1134,989" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="1146" y="921.85" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#777777">
+<tspan x="1146" dy="0">Property illustration</tspan>
+</text>
+<rect x="1140" y="864" width="108" height="25" rx="2" fill="#ffffff" stroke="transparent" opacity="1.0"/>
+<svg x="1146" y="870" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+<text x="1161" y="878.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="1161" dy="0">Thoughtful spaces</tspan>
+</text>
+<svg x="1142" y="1003" width="12" height="12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<text x="1159" y="1011.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="1159" dy="0">Mumbai</tspan>
+</text>
+<text x="1369" y="1010.8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="8" font-weight="400" fill="#777777">
+<tspan x="1369" dy="0">#8</tspan>
+</text>
+<text x="1143" y="1036.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#292929">
+<tspan x="1143" dy="0">Mumbai Courtyard House 8</tspan>
+</text>
+<text x="1143" y="1068.05" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#555555">
+<tspan x="1143" dy="0">₹1,924.00</tspan>
+</text>
+<text x="1224" y="1067.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="1224" dy="0">/ night</tspan>
+</text>
+<svg x="1368" y="1057" width="16" height="16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+<text x="262" y="1127.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="262" dy="0">Page 1 · 8 properties · up to 20 records per page</tspan>
+</text>
+<rect x="1318" y="1107" width="35" height="33" rx="6" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<text x="1334" y="1129.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#555555">
+<tspan x="1334" dy="0">‹</tspan>
+</text>
+<rect x="1363" y="1107" width="35" height="33" rx="6" fill="#ffffff" stroke="#cccccc" opacity="1.0"/>
+<text x="1379" y="1129.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#555555">
+<tspan x="1379" dy="0">›</tspan>
+</text>
+</g>
+<g data-section="assignment-notes">
+<polyline points="262,1185 1398,1185" fill="none" stroke="#cccccc" stroke-width="1"/>
+<text x="262" y="1210.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#777777">
+<tspan x="262" dy="0">StaySpot · Thoughtful stays, meaningful experiences.</tspan>
+</text>
+<rect x="0" y="1240" width="1440" height="40" rx="0" fill="#eeeeee" stroke="transparent" opacity="1.0"/>
+<text x="22" y="1263.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#555555">
+<tspan x="22" dy="0">DESIGN NOTE · Member 1 · Browse.jsx · cards open the detail modal; Book a stay passes the property to Booking.</tspan>
+</text>
+</g>
+</svg>

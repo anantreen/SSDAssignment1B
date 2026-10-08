@@ -1,0 +1,26 @@
+{
+  "product": "StaySpot",
+  "source": "web/src/style.css",
+  "colors": {
+    "paper": "#f7f6f2", "surface": "#fdfdfb", "forest": "#244c38",
+    "terracotta": "#c76a42", "ink": "#283229", "muted": "#7b8176",
+    "line": "#e6e8e0", "sage": "#eaf0e5", "gold": "#c5a771"
+  },
+  "typography": {
+    "display": "Georgia, Times New Roman, serif",
+    "body": "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+    "wireframe": "Helvetica / Excalidraw fontFamily 2"
+  },
+  "layout": { "desktopWidth": 1440, "sidebarWidth": 220, "headerHeight": 88, "mainInset": 42 },
+  "screens": [
+    {"id": "00", "name": "Foundations & Users", "member": 1},
+    {"id": "01", "name": "Browse", "member": 1},
+    {"id": "02", "name": "Property Details", "member": 1},
+    {"id": "03", "name": "Transaction / Book Stay", "member": 2},
+    {"id": "04", "name": "Booking Status & Constraint", "member": 2},
+    {"id": "05", "name": "Wallet Audit Trail", "member": 2},
+    {"id": "06", "name": "Analytics", "member": 3},
+    {"id": "07", "name": "Map / Search Hotspots", "member": 4},
+    {"id": "08", "name": "Reviews & Amenities", "member": 4}
+  ]
+}

@@ -226,6 +226,7 @@ node_modules/
 dist/
 .runtime/
 .venv/
+.design-venv/
 venv/
 __pycache__/
 *.pyc

@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1280" viewBox="0 0 1440 1280" role="img">
+<title>StaySpot — Interaction states</title>
+<g data-section="shell">
+<rect x="0" y="0" width="1440" height="1280" rx="0" fill="#f7f6f2" stroke="transparent" opacity="1.0"/>
+<text x="48" y="47.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#244c38">
+<tspan x="48" dy="0">SUPPLEMENT / SHARED INTERACTION STATES</tspan>
+</text>
+<text x="48" y="113.0" font-family="Georgia, Times New Roman, serif" font-size="40" font-weight="400" fill="#283229">
+<tspan x="48" dy="0">The paths beyond the happy path.</tspan>
+</text>
+<text x="48" y="154.9" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="14" font-weight="400" fill="#7b8176">
+<tspan x="48" dy="0">Independent demo scenarios from the existing components. This is a design annotation board.</tspan>
+</text>
+</g>
+<g data-section="state-0">
+<rect x="48" y="210" width="660" height="280" rx="9" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="72" y="251.15" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#283229">
+<tspan x="72" dy="0">Success · Member 2</tspan>
+</text>
+<rect x="72" y="275" width="612" height="45" rx="5" fill="#eaf0e5" stroke="#e6e8e0" opacity="1.0"/>
+<text x="88" y="301.2" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="12" font-weight="400" fill="#244c38">
+<tspan x="88" dy="0">You’re all set. Booking #50017 is checked in.</tspan>
+</text>
+<text x="72" y="357.75" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7b8176">
+<tspan x="72" dy="0">1 night × ₹5,089 = ₹5,089</tspan>
+<tspan x="72" dy="21.0">Before ₹50,000 → after ₹44,911</tspan>
+<tspan x="72" dy="21.0">Trigger audit #100019 · DEBIT ₹5,089</tspan>
+</text>
+</g>
+<g data-section="state-1">
+<rect x="732" y="210" width="660" height="280" rx="9" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="756" y="251.15" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#283229">
+<tspan x="756" dy="0">Insufficient balance · Member 2</tspan>
+</text>
+<rect x="756" y="275" width="612" height="45" rx="5" fill="#fff0e8" stroke="#e6e8e0" opacity="1.0"/>
+<text x="772" y="301.2" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="12" font-weight="400" fill="#c76a42">
+<tspan x="772" dy="0">Insufficient wallet balance.</tspan>
+</text>
+<text x="756" y="357.75" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7b8176">
+<tspan x="756" dy="0">365 nights × ₹5,089 = ₹18,57,485</tspan>
+<tspan x="756" dy="21.0">Wallet ₹50,000 cannot cover this booking.</tspan>
+<tspan x="756" dy="21.0">Booking, debit and audit are rolled back.</tspan>
+</text>
+</g>
+<g data-section="state-2">
+<rect x="48" y="522" width="660" height="280" rx="9" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="72" y="563.15" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#283229">
+<tspan x="72" dy="0">Active-stay constraint · Member 2</tspan>
+</text>
+<rect x="72" y="587" width="612" height="45" rx="5" fill="#fff0e8" stroke="#e6e8e0" opacity="1.0"/>
+<text x="88" y="613.2" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="12" font-weight="400" fill="#c76a42">
+<tspan x="88" dy="0">This guest already has a checked-in stay.</tspan>
+</text>
+<text x="72" y="669.75" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7b8176">
+<tspan x="72" dy="0">Complete it before checking in again.</tspan>
+<tspan x="72" dy="21.0">Existing stay remains CHECKED_IN.</tspan>
+<tspan x="72" dy="21.0">Rejected reservation remains CONFIRMED.</tspan>
+</text>
+</g>
+<g data-section="state-3">
+<rect x="732" y="522" width="660" height="280" rx="9" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="756" y="563.15" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#283229">
+<tspan x="756" dy="0">Loading / empty · All members</tspan>
+</text>
+<rect x="756" y="587" width="612" height="45" rx="5" fill="#eaf0e5" stroke="#e6e8e0" opacity="1.0"/>
+<text x="772" y="613.2" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="12" font-weight="400" fill="#244c38">
+<tspan x="772" dy="0">Loading…   →   No results for these filters.</tspan>
+</text>
+<text x="756" y="669.75" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7b8176">
+<tspan x="756" dy="0">DataState covers fetches and empty result sets.</tspan>
+<tspan x="756" dy="21.0">Keep filters available so the user can revise them.</tspan>
+<tspan x="756" dy="21.0">No reviews: no average; preserve empty bins.</tspan>
+</text>
+</g>
+<g data-section="state-4">
+<rect x="48" y="834" width="660" height="280" rx="9" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="72" y="875.15" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#283229">
+<tspan x="72" dy="0">Error / retry · All members</tspan>
+</text>
+<rect x="72" y="899" width="612" height="45" rx="5" fill="#fff0e8" stroke="#e6e8e0" opacity="1.0"/>
+<text x="88" y="925.2" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="12" font-weight="400" fill="#c76a42">
+<tspan x="88" dy="0">Request failed. Try again.</tspan>
+</text>
+<text x="72" y="981.75" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7b8176">
+<tspan x="72" dy="0">Alert explains the request failure.</tspan>
+<tspan x="72" dy="21.0">DataState provides Retry for read errors.</tspan>
+<tspan x="72" dy="21.0">Header: Offline when database health fails.</tspan>
+</text>
+<rect x="72" y="1056" width="92" height="34" rx="6" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="88" y="1078.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#244c38">
+<tspan x="88" dy="0">Retry</tspan>
+</text>
+<svg x="134" y="1067" width="17" height="17" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#244c38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+</g>
+<g data-section="state-5">
+<rect x="732" y="834" width="660" height="280" rx="9" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="756" y="875.15" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#283229">
+<tspan x="756" dy="0">Demo guest picker · Member 1</tspan>
+</text>
+<rect x="756" y="899" width="612" height="45" rx="5" fill="#eaf0e5" stroke="#e6e8e0" opacity="1.0"/>
+<text x="772" y="925.2" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="12" font-weight="400" fill="#244c38">
+<tspan x="772" dy="0">Switch your demo guest</tspan>
+</text>
+<text x="756" y="981.75" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7b8176">
+<tspan x="756" dy="0">Search guests… → paged list → select actor</tspan>
+<tspan x="756" dy="21.0">Header name and wallet refresh.</tspan>
+<tspan x="756" dy="21.0">Bookings and audit can follow the selected guest.</tspan>
+</text>
+<rect x="756" y="1056" width="191" height="34" rx="6" fill="#fdfdfb" stroke="#e6e8e0" opacity="1.0"/>
+<text x="772" y="1078.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#244c38">
+<tspan x="772" dy="0">Ananya Rao · #1</tspan>
+</text>
+<svg x="917" y="1067" width="17" height="17" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#244c38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"></path></svg>
+</g>
+<g data-section="assignment-notes">
+<polyline points="262,1185 1398,1185" fill="none" stroke="#e6e8e0" stroke-width="1"/>
+<text x="262" y="1210.65" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="9" font-weight="400" fill="#7b8176">
+<tspan x="262" dy="0">StaySpot · Thoughtful stays, meaningful experiences.</tspan>
+</text>
+<rect x="0" y="1240" width="1440" height="40" rx="0" fill="#eaf0e5" stroke="transparent" opacity="1.0"/>
+<text x="22" y="1263.35" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="11" font-weight="400" fill="#244c38">
+<tspan x="22" dy="0">DESIGN NOTE · Alternative states are annotations. Source: Transaction, BookingStatusAction, DataState, App, Picker and Reviews.</tspan>
+</text>
+</g>
+</svg>

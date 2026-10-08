@@ -142,7 +142,9 @@ The header switches demo actors through paged search; real login is not required
 
 React + Vite provide reusable UI and a small static build. Express keeps the API simple and serves that build. pg and mongodb call the database workflows directly; financial logic stays in PostgreSQL. Leaflet provides map interaction, OpenStreetMap supplies attributed tiles, and inline SVG charts avoid an additional chart dependency. System fonts avoid external font downloads. The package lock fixes installed dependency versions.
 
-[Handover note](docs/handover_note.md), [API sketch](docs/api_endpoints.md), [users/style](docs/design/users_and_style.md), [six pre-build wireframes](docs/design/), [Assignment 2 report](docs/assignment2_report.md), [browser evidence](docs/browser_verification.md).
+[Handover note](docs/handover_note.md), [API sketch](docs/api_endpoints.md), [users/style](docs/design/users_and_style.md), [Assignment 2 report](docs/assignment2_report.md), [browser evidence](docs/browser_verification.md).
+
+The [design handover](docs/design/README.md) contains nine current wireframes and matching UI references in the four-member allocation. Open [the gallery](docs/design/preview.html) locally, or download [the editable Excalidraw wireframe board](docs/design/StaySpot-wireframes.excalidraw) and open it in Excalidraw. SVG/PNG exports and booking/error state annotations are included. No application UI or API changes are introduced by these artifacts.
 
 ![Browse screen](docs/screenshots/01_browse.png)
 

@@ -45,3 +45,5 @@ Member 1's Browse renders Member 2's BookingStatusAction, and all screens reuse 
 Verification: [member split evidence](../performance/member_split_verification.txt), [API test results](../performance/api_test_results.txt), [build results](../performance/build_results.txt).
 
 Read the [code walkthrough](../docs/code_walkthrough.md) alongside the expanded source comments and function docstrings. The documentation pass preserves the supplied four-member allocation.
+
+The [design handover](../docs/design/README.md) follows this same allocation across nine editable wireframe/UI frames. Use [the offline gallery](../docs/design/preview.html) to filter by member, or open [the wireframe board](../docs/design/StaySpot-wireframes.excalidraw) in Excalidraw. Property Details remains a modal and Booking Status remains part of Browse → Bookings.

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StaySpot · Design handover</title>
+    <style>
+      :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #283229; background: #f7f6f2; }
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+      main { max-width: 1440px; margin: auto; padding: 48px 32px 64px; }
+      h1 { font: 48px/1.15 Georgia, serif; margin: 10px 0 18px; }
+      h2 { font-size: 17px; margin: 0; }
+      p { line-height: 1.65; color: #626c5d; }
+      .eyebrow { font-size: 11px; letter-spacing: 2px; color: #244c38; font-weight: 700; }
+      .intro { max-width: 760px; }
+      .downloads, .controls, .filters { display: flex; flex-wrap: wrap; gap: 10px; }
+      a { color: #244c38; }
+      .downloads a, button { border: 1px solid #d5ddcd; background: #fdfdfb; padding: 12px 16px; border-radius: 6px; font: inherit; font-size: 13px; color: #244c38; cursor: pointer; text-decoration: none; }
+      .downloads a:first-child, button[aria-pressed="true"] { background: #244c38; color: white; border-color: #244c38; }
+      .downloads { margin: 24px 0 34px; }
+      .controls { align-items: center; justify-content: space-between; margin-bottom: 20px; }
+      .switch { display: flex; gap: 8px; }
+      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+      article { background: #fdfdfb; border: 1px solid #e6e8e0; border-radius: 9px; overflow: hidden; }
+      article[hidden] { display: none; }
+      article header { padding: 18px 18px 14px; min-height: 90px; }
+      article .member { font-size: 11px; color: #7b8176; margin-top: 8px; }
+      .screen { display: block; border-block: 1px solid #e6e8e0; }
+      .screen img { width: 100%; height: auto; display: block; aspect-ratio: 1440 / 1280; }
+      article footer { display: flex; gap: 18px; padding: 15px 18px; font-size: 12px; }
+      .supplement { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+      .supplement img { width: 100%; border: 1px solid #e6e8e0; border-radius: 9px; }
+      .note { border-top: 1px solid #e6e8e0; padding-top: 20px; margin-top: 32px; font-size: 13px; }
+      :focus-visible { outline: 3px solid #c76a42; outline-offset: 4px; }
+      @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 650px) { main { padding: 32px 18px; } h1 { font-size: 38px; } .grid, .supplement { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="eyebrow">STAYSPOT / ASSIGNMENT 2 / FOUR-MEMBER HANDOVER</div>
+      <h1>A clear view of every stay.</h1>
+      <p class="intro">Nine project-specific wireframes and matching UI references based on the current StaySpot code. Click any screen to view it at full size. Download an editable board and open it in Excalidraw to change individual text, shapes and grouped vectors.</p>
+      <nav class="downloads" aria-label="Design downloads">
+        <a href="StaySpot-wireframes.excalidraw" download>Download wireframe board</a>
+        <a href="StaySpot-ui-reference.excalidraw" download>Download UI reference board</a>
+        <a href="StaySpot-interaction-states.excalidraw" download>Download interaction states</a>
+        <a href="README.md">Editing guide &amp; code mapping</a>
+      </nav>
+      <div class="controls">
+        <div class="switch" aria-label="Preview style">
+          <button data-mode="ui-mockups" aria-pressed="true">UI reference</button>
+          <button data-mode="wireframes" aria-pressed="false">Wireframes</button>
+        </div>
+        <div class="filters" aria-label="Member filter">
+          <button data-member="all" aria-pressed="true">All members</button>
+          <button data-member="1" aria-pressed="false">Member 1</button>
+          <button data-member="2" aria-pressed="false">Member 2</button>
+          <button data-member="3" aria-pressed="false">Member 3</button>
+          <button data-member="4" aria-pressed="false">Member 4</button>
+        </div>
+      </div>
+      <div class="grid" id="screens"></div>
+      <section class="supplement" aria-label="Interaction states">
+        <div>
+          <h2>Success, constraints and recovery</h2>
+          <p>The separate state board explains the booking receipt, insufficient wallet balance, one-active-stay rule, loading/empty results, retry and demo guest picker.</p>
+          <p>Property details remain a modal over Browse. Booking status actions remain in Browse → Bookings. Foundations, state diagrams and bottom note strips are design documentation.</p>
+          <p><a href="interaction-states.svg">Open the state board at full size</a></p>
+        </div>
+        <a href="interaction-states.svg"><img src="interaction-states.svg" alt="Six annotated StaySpot interaction states" loading="lazy" /></a>
+      </section>
+      <p class="note">The running application's UI and APIs are unchanged. Values are representative demo samples; charts and row excerpts are illustrative. The map is a labeled schematic. Excalidraw uses Helvetica; SVG references retain the app's Georgia/system font stack. These are design references, not a clickable application prototype.</p>
+    </main>
+    <script>
+      // This gallery works directly from a local file: no fetches or server needed.
+      const screens = [
+        ["00_foundations", "00 Foundations & Users", "1"],
+        ["01_browse", "01 Browse", "1"],
+        ["02_property_details", "02 Property Details", "1"],
+        ["03_book_stay", "03 Transaction / Book Stay", "2"],
+        ["04_booking_status", "04 Booking Status & Constraint", "2"],
+        ["05_wallet_audit", "05 Wallet Audit Trail", "2"],
+        ["06_analytics", "06 Analytics", "3"],
+        ["07_search_map", "07 Map / Search Hotspots", "4"],
+        ["08_reviews", "08 Reviews & Amenities", "4"],
+      ];
+      let mode = "ui-mockups";
+      let member = "all";
+      const gallery = document.getElementById("screens");
+
+      function render() {
+        gallery.replaceChildren();
+        for (const [slug, title, owner] of screens) {
+          const article = document.createElement("article");
+          article.hidden = member !== "all" && member !== owner;
+          const header = document.createElement("header");
+          const heading = document.createElement("h2");
+          heading.textContent = title;
+          const attribution = document.createElement("div");
+          attribution.className = "member";
+          attribution.textContent = `Member ${owner}`;
+          header.append(heading, attribution);
+          const link = document.createElement("a");
+          link.className = "screen";
+          link.href = `${mode}/${slug}.svg`;
+          const image = document.createElement("img");
+          image.src = link.href;
+          image.alt = `${title} — ${mode === "wireframes" ? "wireframe" : "UI reference"}`;
+          image.loading = "lazy";
+          link.append(image);
+          const footer = document.createElement("footer");
+          for (const format of ["svg", "png"]) {
+            const download = document.createElement("a");
+            download.href = `${mode}/${slug}.${format}`;
+            download.download = "";
+            download.textContent = `Download ${format.toUpperCase()}`;
+            footer.append(download);
+          }
+          article.append(header, link, footer);
+          gallery.append(article);
+        }
+      }
+
+      for (const button of document.querySelectorAll("[data-mode]")) {
+        button.addEventListener("click", () => {
+          mode = button.dataset.mode;
+          for (const option of document.querySelectorAll("[data-mode]")) {
+            option.setAttribute("aria-pressed", String(option === button));
+          }
+          render();
+        });
+      }
+      for (const button of document.querySelectorAll("[data-member]")) {
+        button.addEventListener("click", () => {
+          member = button.dataset.member;
+          for (const option of document.querySelectorAll("[data-member]")) {
+            option.setAttribute("aria-pressed", String(option === button));
+          }
+          render();
+        });
+      }
+      render();
+    </script>
+  </body>
+</html>
